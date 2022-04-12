@@ -1,3 +1,4 @@
+import 'package:bobby_shopping/product.dart';
 import 'package:flutter/material.dart';
 
 import 'custom_colors.dart';
@@ -10,38 +11,73 @@ class Shop extends StatefulWidget {
 }
 
 class _ShopState extends State<Shop> {
-  _onPressedSearch() {}
+  List<Widget> _widgetsList = [];
+  bool _favoritesDisplayed = false;
+
+  _onPressedSeeFavorites() {
+    setState(() {
+      if (_favoritesDisplayed){
+        _rebuildWidgets();
+      }
+      else{
+        _rebuildFavorites();
+      }
+      _favoritesDisplayed = !_favoritesDisplayed;
+    });
+  }
+
+  _onPressedAddFavorite(Product _product) {
+    setState(() {
+      _product.inFavorites = true;
+    });
+  }
+
+  _rebuildFavorites(){
+    setState(() {
+      _widgetsList.clear();
+      for (var _product in allProducts){
+        if (_product.inFavorites){
+          _widgetsList.add(_listItem(context, _product));
+        }
+      }
+    });
+  }
+
+  _rebuildWidgets(){
+    setState(() {
+      _widgetsList.clear();
+      for (var _product in allProducts){
+        _widgetsList.add(_listItem(context, _product));
+      }
+    });
+
+  }
 
   @override
   void initState() {
+    allProducts.clear();
+    allProducts.add(Product("Carrot", "graphics/carrot.png", Colors.orange.shade200, Colors.orange.shade600));
+    allProducts.add(Product("Apple", "graphics/carrot.png", Colors.green.shade200, Colors.green.shade600));
+    allProducts.add(Product("Strawberry", "graphics/carrot.png", Colors.red.shade200, Colors.red.shade600));
+    allProducts.add(Product("Banana", "graphics/carrot.png", Colors.yellow.shade200, Colors.yellow.shade600));
     CustomColors.currentColor = CustomColors.blueColor.shade900;
+    _rebuildWidgets();
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    /*return Scaffold(
-        appBar: AppBar(
-        centerTitle: true,
-        backgroundColor: CustomColors.currentColor,
-        title: const Text('Shop'),
-    leading: IconButton(
-    icon: Icon(Icons.home),
-    onPressed: () => Navigator.of(context).pop(),
-    ),
-    ),
-    floatingActionButton: FloatingActionButton(
-    onPressed: _onPressedSearch,
-    child: const Icon(Icons.search),
-    ),
-      body: CustomScrollView(SingleChildScrollView(child: SliverGrid.count(
-        crossAxisCount: 4,
-        children: [Text("Carrot"), Text("Carrot"),Text("Carrot"),Text("Carrot")]
-      )),
-    );*/
+    for (var _product in allProducts){
+      _widgetsList.add(_listItem(context, _product));
+    }
 
-    var size = MediaQuery.of(context).size;
     return Scaffold(
+      floatingActionButton: FloatingActionButton(
+        heroTag: "0",
+        onPressed: _onPressedSeeFavorites,
+        child: const Icon(Icons.favorite, color: Colors.redAccent),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endTop,
       body: SafeArea(
         child: Container(
           child: CustomScrollView(
@@ -63,20 +99,7 @@ class _ShopState extends State<Shop> {
                   childAspectRatio: 1,
                   crossAxisSpacing: 10,
                   mainAxisSpacing: 10,
-                  children: <Widget>[
-                    _listItem(context, 0),
-                    _listItem(context, 0),
-                    _listItem(context, 0),
-                    _listItem(context, 0),
-                    _listItem(context, 0),
-                    _listItem(context, 0),
-                    _listItem(context, 0),
-                    _listItem(context, 0),
-                    _listItem(context, 0),
-                    _listItem(context, 0),
-                    _listItem(context, 0),
-                    _listItem(context, 0),
-                  ],
+                  children: _widgetsList,
                 ),
               ),
             ],
@@ -87,7 +110,7 @@ class _ShopState extends State<Shop> {
   }
 
   //Builder for each game in the trending list
-  Widget _listItem(BuildContext context, int index) {
+  Widget _listItem(BuildContext context, Product _product) {
     return Padding(padding: const EdgeInsets.all(5), child:Container(
       width: 300,
       height: 300,
@@ -96,25 +119,27 @@ class _ShopState extends State<Shop> {
         child: Column(children: [
           Spacer(),
           Text(
-          "Carrot",
-          style: TextStyle(color: Colors.white, fontSize: 40),
-          textAlign: TextAlign.center,
+            _product.name,
+            style: TextStyle(color: Colors.white, fontSize: 40),
+            textAlign: TextAlign.center,
           ),
           SizedBox(
               height: 100,
               width: 100,
-              child: Image.asset('graphics/carrot.png')
+              child: Image.asset(_product.image)
           ),
           SizedBox(height: 50, child:
           Row(children: [
             Spacer(),
             FloatingActionButton(
-              onPressed: () {},
-              child: const Icon(Icons.favorite, color: Colors.redAccent)  ),
+                heroTag: "1",
+                onPressed: () => _onPressedAddFavorite(_product),
+                child: const Icon(Icons.favorite_border, color: Colors.redAccent)),
             Spacer(),
             FloatingActionButton(
-                onPressed: () {},
-                child: const Icon(Icons.add),),
+              heroTag: "2",
+              onPressed: () {},
+              child: const Icon(Icons.add),),
             Spacer(),
           ])),
           Spacer()
@@ -125,8 +150,8 @@ class _ShopState extends State<Shop> {
             begin: Alignment.topRight,
             end: Alignment.bottomLeft,
             colors: [
-              Colors.orange.shade200,
-              Colors.orange.shade600,
+              _product.colorPrimary,
+              _product.colorSecondary,
             ],
           ),
           borderRadius: BorderRadius.circular(50),
