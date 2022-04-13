@@ -53,7 +53,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
   void initState() {
     super.initState();
     Future.delayed(
-        const Duration(seconds: 3),
+        const Duration(seconds: 0),
             () => Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => MainMenu()),

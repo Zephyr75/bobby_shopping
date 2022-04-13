@@ -11,48 +11,35 @@ class Shop extends StatefulWidget {
 }
 
 class _ShopState extends State<Shop> {
-  List<Widget> _widgetsList = [];
+  List<Product> _favorites = [];
   bool _favoritesDisplayed = false;
 
   _onPressedSeeFavorites() {
     setState(() {
-      if (_favoritesDisplayed){
-        _rebuildWidgets();
-      }
-      else{
+      if (!_favoritesDisplayed){
         _rebuildFavorites();
       }
       _favoritesDisplayed = !_favoritesDisplayed;
+      print("favorites displayed → " + _favoritesDisplayed.toString());
     });
   }
 
   _onPressedAddFavorite(Product _product) {
     setState(() {
-      print(_product.inFavorites);
       _product.inFavorites = !_product.inFavorites;
     });
   }
 
   _rebuildFavorites(){
-    print("favorites");
     setState(() {
-      _widgetsList.clear();
+      _favorites.clear();
       for (var _product in allProducts){
         if (_product.inFavorites){
-          _widgetsList.add(_listItem(context, _product));
+          print("+1");
+          _favorites.add(_product);
         }
       }
     });
-  }
-
-  _rebuildWidgets(){
-    setState(() {
-      _widgetsList.clear();
-      for (var _product in allProducts){
-        _widgetsList.add(_listItem(context, _product));
-      }
-    });
-
   }
 
   @override
@@ -71,47 +58,57 @@ class _ShopState extends State<Shop> {
     allProducts.add(Product("Strawberry", "graphics/carrot.png", Colors.red.shade200, Colors.red.shade600));
     allProducts.add(Product("Banana", "graphics/carrot.png", Colors.yellow.shade200, Colors.yellow.shade600));
     CustomColors.currentColor = CustomColors.blueColor.shade900;
-    _rebuildWidgets();
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: CustomColors.currentColor,
+        centerTitle: true,
+        title: const Text('Shop'),
+        leading: IconButton(
+          icon: Icon(Icons.home),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
+      ),
       floatingActionButton: FloatingActionButton(
         onPressed: _onPressedSeeFavorites,
-        child: const Icon(Icons.favorite, color: Colors.redAccent),
+        child: Icon(Icons.favorite, color: _favoritesDisplayed ? Colors.redAccent : Colors.black),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endTop,
-      body: SafeArea(
-        child: Container(
-          child: CustomScrollView(
+      body: CustomScrollView(
             slivers: [
-              SliverAppBar(
-                pinned: true,
-                backgroundColor: CustomColors.currentColor,
-                centerTitle: true,
-                title: const Text('Shop'),
-                leading: IconButton(
-                  icon: Icon(Icons.home),
-                  onPressed: () => Navigator.of(context).pop(),
-                ),
-              ),
-              SliverPadding(
+              /*SliverPadding(
                 padding: EdgeInsets.only(left: 100, right: 100, top: 15, bottom: 15),
                 sliver: SliverGrid.count(
                   crossAxisCount: 4,
-                  childAspectRatio: 1,
+                  childAspectRatio: 1.01,
                   crossAxisSpacing: 10,
                   mainAxisSpacing: 10,
                   children: _widgetsList,
                 ),
-              ),
+              ),*/
+      SliverPadding(
+      padding: EdgeInsets.only(left: 100, right: 100, top: 15, bottom: 15),
+      sliver: SliverGrid(
+                delegate: SliverChildBuilderDelegate(
+                      (context, index) {
+                    return _listItem(context, _favoritesDisplayed ? _favorites[index] : allProducts[index]);
+                  },
+                  childCount: _favoritesDisplayed ? _favorites.length : allProducts.length,
+                ),
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 4,
+                  mainAxisSpacing: 10,
+                  crossAxisSpacing: 10,
+                  childAspectRatio: 1.0,
+                ),
+              )),
             ],
           ),
-        ),
-      ),
-    );
+        );
   }
 
   //Builder for each game in the trending list
@@ -152,7 +149,7 @@ class _ShopState extends State<Shop> {
                 shape: const CircleBorder(),
               ),
               onPressed: () {},
-              child: const Icon(Icons.add),),
+              child: const Icon(Icons.add, color: Colors.black)),
             Spacer(),
           ])),
           Spacer()
