@@ -28,11 +28,13 @@ class _ShopState extends State<Shop> {
 
   _onPressedAddFavorite(Product _product) {
     setState(() {
-      _product.inFavorites = true;
+      print(_product.inFavorites);
+      _product.inFavorites = !_product.inFavorites;
     });
   }
 
   _rebuildFavorites(){
+    print("favorites");
     setState(() {
       _widgetsList.clear();
       for (var _product in allProducts){
@@ -60,6 +62,14 @@ class _ShopState extends State<Shop> {
     allProducts.add(Product("Apple", "graphics/carrot.png", Colors.green.shade200, Colors.green.shade600));
     allProducts.add(Product("Strawberry", "graphics/carrot.png", Colors.red.shade200, Colors.red.shade600));
     allProducts.add(Product("Banana", "graphics/carrot.png", Colors.yellow.shade200, Colors.yellow.shade600));
+    allProducts.add(Product("Carrot", "graphics/carrot.png", Colors.orange.shade200, Colors.orange.shade600));
+    allProducts.add(Product("Apple", "graphics/carrot.png", Colors.green.shade200, Colors.green.shade600));
+    allProducts.add(Product("Strawberry", "graphics/carrot.png", Colors.red.shade200, Colors.red.shade600));
+    allProducts.add(Product("Banana", "graphics/carrot.png", Colors.yellow.shade200, Colors.yellow.shade600));
+    allProducts.add(Product("Carrot", "graphics/carrot.png", Colors.orange.shade200, Colors.orange.shade600));
+    allProducts.add(Product("Apple", "graphics/carrot.png", Colors.green.shade200, Colors.green.shade600));
+    allProducts.add(Product("Strawberry", "graphics/carrot.png", Colors.red.shade200, Colors.red.shade600));
+    allProducts.add(Product("Banana", "graphics/carrot.png", Colors.yellow.shade200, Colors.yellow.shade600));
     CustomColors.currentColor = CustomColors.blueColor.shade900;
     _rebuildWidgets();
     super.initState();
@@ -67,13 +77,8 @@ class _ShopState extends State<Shop> {
 
   @override
   Widget build(BuildContext context) {
-    for (var _product in allProducts){
-      _widgetsList.add(_listItem(context, _product));
-    }
-
     return Scaffold(
       floatingActionButton: FloatingActionButton(
-        heroTag: "0",
         onPressed: _onPressedSeeFavorites,
         child: const Icon(Icons.favorite, color: Colors.redAccent),
       ),
@@ -131,13 +136,21 @@ class _ShopState extends State<Shop> {
           SizedBox(height: 50, child:
           Row(children: [
             Spacer(),
-            FloatingActionButton(
-                heroTag: "1",
+            ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  primary: Colors.white,
+                  fixedSize: const Size(100, 100),
+                  shape: const CircleBorder(),
+                ),
                 onPressed: () => _onPressedAddFavorite(_product),
-                child: const Icon(Icons.favorite_border, color: Colors.redAccent)),
+                child: Icon(_product.inFavorites ? Icons.favorite : Icons.favorite_border, color: Colors.redAccent)),
             Spacer(),
-            FloatingActionButton(
-              heroTag: "2",
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                primary: Colors.white,
+                fixedSize: const Size(100, 100),
+                shape: const CircleBorder(),
+              ),
               onPressed: () {},
               child: const Icon(Icons.add),),
             Spacer(),
