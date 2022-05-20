@@ -52,7 +52,7 @@ class _SignInState extends State<SignIn> {
                       child: TextFormField(
                         keyboardType: TextInputType.emailAddress,
                         decoration: const InputDecoration(
-                          icon: Icon(Icons.mail),
+                          prefixIcon: Icon(Icons.mail),
                           hintText: 'Enter your email',
                           labelText: 'Email',
                         ),

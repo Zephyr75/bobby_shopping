@@ -206,26 +206,21 @@ class _ShopState extends State<Shop> {
         child: Container(
           width: 50,
           height: 50,
-          child: TextButton(
-            onPressed: () => {},
-            child: Column(children: [
-              Spacer(),
-            FittedBox(
-                fit: BoxFit.fitWidth,
-                child: Text(
+          child: Column(children: [
+              SizedBox(height: 10),
+              Text(
                 _product.name,
-                style: TextStyle(color: Colors.white),
+                style: TextStyle(color: Colors.white, fontSize: 30),
                 textAlign: TextAlign.center,
-              )),
-              FittedBox(
-                  fit: BoxFit.fitWidth,
-                  child: Image.asset(_product.image)),
+              ),
+              Expanded(child: Image.asset(_product.image)),
               Row(children: [
+                Spacer(),
                 ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       primary: Colors.white,
-                      fixedSize: const Size(15, 15),
                       shape: const CircleBorder(),
+                      fixedSize: const Size(40, 40),
                     ),
                     onPressed: () => _onPressedAddFavorite(_product),
                     child: Icon(
@@ -237,14 +232,15 @@ class _ShopState extends State<Shop> {
                 ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       primary: Colors.white,
-                      fixedSize: const Size(15, 15),
                       shape: const CircleBorder(),
+                      fixedSize: const Size(40, 40),
                     ),
                     onPressed: () => _onPressedPlus(_product),
                     child: const Icon(Icons.add, color: Colors.black)),
+                Spacer(),
               ]),
+            SizedBox(height: 10),
             ]),
-          ),
           decoration: BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.topRight,
