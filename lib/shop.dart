@@ -1,5 +1,6 @@
 import 'package:bobby_shopping/product.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_icons/flutter_icons.dart';
 
 import 'custom_colors.dart';
 
@@ -45,19 +46,17 @@ class _ShopState extends State<Shop> {
   @override
   void initState() {
     allProducts.clear();
-    allProducts.add(Product("Carrot", "graphics/carrot.png", Colors.orange.shade200, Colors.orange.shade600));
-    allProducts.add(Product("Apple", "graphics/carrot.png", Colors.green.shade200, Colors.green.shade600));
-    allProducts.add(Product("Strawberry", "graphics/carrot.png", Colors.red.shade200, Colors.red.shade600));
-    allProducts.add(Product("Banana", "graphics/carrot.png", Colors.yellow.shade200, Colors.yellow.shade600));
-    allProducts.add(Product("Carrot", "graphics/carrot.png", Colors.orange.shade200, Colors.orange.shade600));
-    allProducts.add(Product("Apple", "graphics/carrot.png", Colors.green.shade200, Colors.green.shade600));
-    allProducts.add(Product("Strawberry", "graphics/carrot.png", Colors.red.shade200, Colors.red.shade600));
-    allProducts.add(Product("Banana", "graphics/carrot.png", Colors.yellow.shade200, Colors.yellow.shade600));
-    allProducts.add(Product("Carrot", "graphics/carrot.png", Colors.orange.shade200, Colors.orange.shade600));
-    allProducts.add(Product("Apple", "graphics/carrot.png", Colors.green.shade200, Colors.green.shade600));
-    allProducts.add(Product("Strawberry", "graphics/carrot.png", Colors.red.shade200, Colors.red.shade600));
-    allProducts.add(Product("Banana", "graphics/carrot.png", Colors.yellow.shade200, Colors.yellow.shade600));
-    CustomColors.currentColor = CustomColors.blueColor.shade900;
+    allProducts.add(Product("Pear", "graphics/pear.png", Colors.green.shade200, Colors.green.shade600));
+    allProducts.add(Product("Peach", "graphics/peach.png", Colors.red.shade200, Colors.red.shade600));
+    allProducts.add(Product("Banana", "graphics/banana.png", Colors.yellow.shade200, Colors.yellow.shade600));
+    allProducts.add(Product("Apple", "graphics/apple.png", Colors.green.shade200, Colors.green.shade600));
+    allProducts.add(Product("Peach", "graphics/peach.png", Colors.red.shade200, Colors.red.shade600));
+    allProducts.add(Product("Banana", "graphics/banana.png", Colors.yellow.shade200, Colors.yellow.shade600));
+    allProducts.add(Product("Peach", "graphics/peach.png", Colors.red.shade200, Colors.red.shade600));
+    allProducts.add(Product("Pear", "graphics/pear.png", Colors.green.shade200, Colors.green.shade600));
+    allProducts.add(Product("Banana", "graphics/banana.png", Colors.yellow.shade200, Colors.yellow.shade600));
+    allProducts.add(Product("Apple", "graphics/apple.png", Colors.green.shade200, Colors.green.shade600));
+    CustomColors.currentColor = CustomColors.greenColor.shade900;
     super.initState();
   }
 
@@ -65,33 +64,68 @@ class _ShopState extends State<Shop> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        actions: [
+          Builder(
+            builder: (context) => Container(),
+          ),
+        ],
         backgroundColor: CustomColors.currentColor,
-        centerTitle: true,
         title: const Text('Shop'),
         leading: IconButton(
           icon: Icon(Icons.home),
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: SizedBox(width: 200, child: Row(children:[
+        FloatingActionButton(
         onPressed: _onPressedSeeFavorites,
         child: Icon(Icons.favorite, color: _favoritesDisplayed ? Colors.redAccent : Colors.black),
-      ),
+        ),
+        const Spacer(),
+        ElevatedButton.icon(
+          onPressed: () {},
+          label: const Text("Order", style: TextStyle(color: Colors.black, fontSize: 18)),
+          icon: const Icon(FontAwesome.shopping_cart, color: Colors.black),
+          style: ElevatedButton.styleFrom(
+            shape: const StadiumBorder(),
+            fixedSize: const Size(130, 55),
+            primary: Colors.white
+          ),
+        )
+      ])),
       floatingActionButtonLocation: FloatingActionButtonLocation.endTop,
-      body: CustomScrollView(
-            slivers: [
-              /*SliverPadding(
-                padding: EdgeInsets.only(left: 100, right: 100, top: 15, bottom: 15),
-                sliver: SliverGrid.count(
-                  crossAxisCount: 4,
-                  childAspectRatio: 1.01,
-                  crossAxisSpacing: 10,
-                  mainAxisSpacing: 10,
-                  children: _widgetsList,
+        endDrawer: Drawer(
+          child: ListView(
+            padding: EdgeInsets.zero,
+            children: [
+              DrawerHeader(
+                decoration: BoxDecoration(
+                  color: CustomColors.greenColor.shade900,
                 ),
-              ),*/
+                child: Center(child: Text('Shopping list')),
+              ),
+              ListTile(
+                title: const Text('Item 1'),
+                onTap: () {
+                  Navigator.pop(context);
+                },
+              ),
+              ListTile(
+                title: const Text('Item 2'),
+                onTap: () {
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          ),
+        ),
+      body: Builder(
+    builder: (context) => SizedBox(width: MediaQuery.of(context).size.width, child: Row(children:[
+          SizedBox(width: MediaQuery.of(context).size.width * 6 / 7, child:
+          CustomScrollView(
+            slivers: [
       SliverPadding(
-      padding: EdgeInsets.only(left: 100, right: 100, top: 15, bottom: 15),
+      padding: const EdgeInsets.only(left: 15, right: 15, top: 15, bottom: 15),
       sliver: SliverGrid(
                 delegate: SliverChildBuilderDelegate(
                       (context, index) {
@@ -99,60 +133,60 @@ class _ShopState extends State<Shop> {
                   },
                   childCount: _favoritesDisplayed ? _favorites.length : allProducts.length,
                 ),
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 4,
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: MediaQuery.of(context).size.width * 3 / 4 > 1000 ? 4
+                      : (MediaQuery.of(context).size.width * 3 / 4 > 600 ? 3
+                      : (MediaQuery.of(context).size.width * 3 / 4 > 200 ? 2 : 1)),
                   mainAxisSpacing: 10,
                   crossAxisSpacing: 10,
                   childAspectRatio: 1.0,
                 ),
               )),
-            ],
+            ]),
           ),
-        );
+        Center(child: IconButton(icon: Icon(Icons.arrow_back_ios_sharp), onPressed: () {
+          Scaffold.of(context).openEndDrawer();
+        },))
+    ]))));
   }
 
   //Builder for each game in the trending list
   Widget _listItem(BuildContext context, Product _product) {
-    return Padding(padding: const EdgeInsets.all(5), child:Container(
-      width: 300,
-      height: 300,
+    return Padding(padding: const EdgeInsets.all(0), child:Container(
+      width: 50,
+      height: 50,
       child: TextButton(
         onPressed: () => {},
         child: Column(children: [
           Spacer(),
           Text(
             _product.name,
-            style: TextStyle(color: Colors.white, fontSize: 40),
+            style: TextStyle(color: Colors.white, fontSize: MediaQuery.of(context).size.width / 30),
             textAlign: TextAlign.center,
           ),
           SizedBox(
-              height: 100,
-              width: 100,
+              height: MediaQuery.of(context).size.width / 7,
+              width: MediaQuery.of(context).size.width / 7,
               child: Image.asset(_product.image)
           ),
-          SizedBox(height: 50, child:
           Row(children: [
-            Spacer(),
             ElevatedButton(
                 style: ElevatedButton.styleFrom(
                   primary: Colors.white,
-                  fixedSize: const Size(100, 100),
+                  fixedSize: const Size(15, 15),
                   shape: const CircleBorder(),
                 ),
                 onPressed: () => _onPressedAddFavorite(_product),
                 child: Icon(_product.inFavorites ? Icons.favorite : Icons.favorite_border, color: Colors.redAccent)),
-            Spacer(),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
                 primary: Colors.white,
-                fixedSize: const Size(100, 100),
+                fixedSize: const Size(15, 15),
                 shape: const CircleBorder(),
               ),
               onPressed: () {},
               child: const Icon(Icons.add, color: Colors.black)),
-            Spacer(),
-          ])),
-          Spacer()
+          ]),
         ]),
       ),
       decoration: BoxDecoration(
@@ -165,12 +199,11 @@ class _ShopState extends State<Shop> {
             ],
           ),
           borderRadius: BorderRadius.circular(50),
-          //color: Colors.orange.shade200,
           boxShadow: [
             BoxShadow(
               blurRadius: 2,
               color: Colors.grey.shade300,
-              offset: const Offset(0, 10), // changes position of shadow
+              offset: const Offset(0, 10),
             ),
           ]
       ),

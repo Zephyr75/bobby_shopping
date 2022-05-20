@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "869179046649",
+    "project_id": "bobby-shopping",
+    "storage_bucket": "bobby-shopping.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:869179046649:android:c21fc34032c999cf048028",
+        "android_client_info": {
+          "package_name": "com.example.bobby_shopping"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "869179046649-0kg8ap3cpsvrj7of04ao1s84dlnfq5c1.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAJGvDx_eQaCn82PThlzMsM65_Fpx2jWgc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "869179046649-0kg8ap3cpsvrj7of04ao1s84dlnfq5c1.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "869179046649-q98kithdptc9gmh7v45ftcghukeh1ens.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.bobbyShopping"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

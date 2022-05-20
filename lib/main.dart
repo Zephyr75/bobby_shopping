@@ -1,15 +1,74 @@
+import 'dart:convert';
+import 'dart:io';
+
+import 'package:bobby_shopping/previous_commands.dart';
+import 'package:bobby_shopping/product.dart';
 import 'package:bobby_shopping/shop.dart';
+import 'package:bobby_shopping/sign_in.dart';
+import 'package:bobby_shopping/sign_up.dart';
+import 'package:bobby_shopping/welcome_screen.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import 'command.dart';
+import 'common.dart';
 import 'custom_colors.dart';
+import 'firebase_api.dart';
+import 'firebase_options.dart';
 
 
 bool darkTheme = false;
 
+class Achievement {
+  final String label;
+  final String type;
+  final int steps;
 
-void main() {
+  Achievement(this.label, this.type, this.steps);
+
+  Achievement.fromJson(Map<String, dynamic> json)
+      : label = json['label'],
+        type = json['type'],
+        steps = json['steps'];
+
+  Map<String, dynamic> toJson() =>
+      {'label': label, 'type': type, 'steps': steps};
+}
+
+Future<void> main() async {
+  /*var path =
+      "C:/Users/antoi/AppData/LocalLow/DefaultCompany/Achievements/achievements.json";
+  File(path)
+      .openRead()
+      .transform(utf8.decoder)
+      .transform(new LineSplitter())
+      .forEach((l) {
+    Map<String, dynamic> achievementMap = jsonDecode(l);
+    var achievement = Achievement.fromJson(achievementMap);
+
+    print(achievement.label);
+  });*/
+
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
+  FirebaseApi.signIn("bobby@epfl.ch", "123456");
+
+  FirebaseApi.addProduct("Banana", 5);
+  FirebaseApi.getProducts();
+
+  Product carrot = Product("Banana", "graphics/carrot.png", Colors.yellow.shade200, Colors.yellow.shade600);
+  Product apple = Product("Apple", "graphics/carrot.png", Colors.green.shade200, Colors.green.shade600);
+
+  Common.allCommands.add(Command([carrot, carrot], DateTime.now()));
+  Common.allCommands.add(Command([carrot, apple], DateTime.now()));
+  Common.allCommands.add(Command([apple, apple], DateTime.now()));
+
   runApp(MyApp());
 }
 
@@ -40,37 +99,6 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class WelcomeScreen extends StatefulWidget {
-  const WelcomeScreen({Key? key}) : super(key: key);
-
-  @override
-  _WelcomeScreenState createState() => _WelcomeScreenState();
-}
-
-class _WelcomeScreenState extends State<WelcomeScreen> {
-
-  @override
-  void initState() {
-    super.initState();
-    Future.delayed(
-        const Duration(seconds: 0),
-            () => Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => MainMenu()),
-        ));
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(body: Center(child:
-        FractionallySizedBox(
-      heightFactor: .3,
-        widthFactor: .3,
-        child: Image.asset('graphics/logo.png')
-    )));
-  }
-}
-
 class MainMenu extends StatefulWidget {
   const MainMenu({Key? key}) : super(key: key);
 
@@ -80,23 +108,16 @@ class MainMenu extends StatefulWidget {
 
 class _MainMenuState extends State<MainMenu> {
 
-  _onPressedShop() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const Shop()),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(child: Column(
         children: [
           Spacer(flex: 2),
-          Text("Welcome Christoph!", style: TextStyle(fontSize: 50),),
+          Text("Welcome !", style: TextStyle(fontSize: 50),),
           Spacer(),
           ElevatedButton.icon(
-              onPressed: _onPressedShop,
+              onPressed: () => Common.goToTarget(context, const Shop()),
               icon: const Icon(
                 Feather.shopping_cart,
                 color: Colors.white,
@@ -104,12 +125,12 @@ class _MainMenuState extends State<MainMenu> {
               ),
               label: const Text(" Shop", style: TextStyle(fontSize: 25), textAlign: TextAlign.center),
               style: ElevatedButton.styleFrom(
-                  primary: CustomColors.blueColor.shade900,
+                  primary: CustomColors.greenColor.shade900,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
                   fixedSize: const Size(300, 100))),
           Spacer(),
           ElevatedButton.icon(
-              onPressed: _onPressedShop,
+              onPressed: () => Common.goToTarget(context, const PreviousCommands()),
               icon: const Icon(
                 MaterialIcons.history,
                 color: Colors.white,
@@ -117,12 +138,12 @@ class _MainMenuState extends State<MainMenu> {
               ),
               label: const Text(" Previous commands", style: TextStyle(fontSize: 20), textAlign: TextAlign.center),
               style: ElevatedButton.styleFrom(
-                  primary: CustomColors.greenColor.shade900,
+                  primary: CustomColors.blueColor.shade900,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
                   fixedSize: const Size(300, 100))),
           Spacer(),
           ElevatedButton.icon(
-              onPressed: _onPressedShop,
+              onPressed: () => Common.goToTarget(context, const SignIn()),
               icon: const Icon(
                 Octicons.sign_out,
                 color: Colors.white,

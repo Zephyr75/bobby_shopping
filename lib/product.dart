@@ -6,6 +6,7 @@ class Product{
   Color colorPrimary = Colors.black;
   Color colorSecondary = Colors.black;
   bool inFavorites = false;
+  bool isExpanded = false;
 
   Product(
       this.name,
