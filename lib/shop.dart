@@ -1,4 +1,5 @@
 import 'package:bobby_shopping/product.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 
@@ -15,7 +16,16 @@ class _ShopState extends State<Shop> {
   List<Product> _favorites = [];
   bool _favoritesDisplayed = false;
   List<Product> _shoppingList = [];
-  List<Widget> _shoppingListWidget = [];
+  List<Widget> _shoppingListWidget = [
+    DrawerHeader(
+      decoration: BoxDecoration(
+        color: CustomColors.greenColor.shade900,
+      ),
+      child: Center(
+          child: Text('Shopping list',
+              style: TextStyle(fontSize: 25, color: Colors.white))),
+    )
+  ];
 
   _onPressedSeeFavorites() {
     setState(() {
@@ -45,17 +55,18 @@ class _ShopState extends State<Shop> {
             child: Text('Shopping list',
                 style: TextStyle(fontSize: 25, color: Colors.white))),
       ));
-      for(var _a in allProducts){
+      for (var _a in allProducts) {
         int _count = 0;
-        for(var _b in _shoppingList){
-          if (_a.name == _b.name){
+        for (var _b in _shoppingList) {
+          if (_a.name == _b.name) {
             _count++;
           }
         }
-        if (_count > 0){
+        if (_count > 0) {
           _shoppingListWidget.add(ListTile(
               title: Center(
-                  child: Text(_count.toString() + _a.name, style: TextStyle(fontSize: 20)))));
+                  child: Text(_count.toString() + " " + _a.name,
+                      style: TextStyle(fontSize: 20)))));
         }
       }
     });
@@ -118,18 +129,20 @@ class _ShopState extends State<Shop> {
               )
             ])),
         floatingActionButtonLocation: FloatingActionButtonLocation.endTop,
-        endDrawer: Drawer(
-          child: ListView(
-            padding: EdgeInsets.zero,
-            children: _shoppingListWidget,
-          ),
-        ),
+        endDrawer: kIsWeb
+            ? null
+            : Drawer(
+                child: ListView(
+                  padding: EdgeInsets.zero,
+                  children: _shoppingListWidget,
+                ),
+              ),
         body: Builder(
             builder: (context) => SizedBox(
                 width: MediaQuery.of(context).size.width,
                 child: Row(children: [
                   SizedBox(
-                    width: MediaQuery.of(context).size.width * 6 / 7,
+                    width: kIsWeb ? MediaQuery.of(context).size.width * 3 / 4 : MediaQuery.of(context).size.width - 50,
                     child: CustomScrollView(slivers: [
                       SliverPadding(
                           padding: const EdgeInsets.only(
@@ -172,12 +185,17 @@ class _ShopState extends State<Shop> {
                     ]),
                   ),
                   Center(
-                      child: IconButton(
-                    icon: Icon(Icons.arrow_back_ios_sharp),
-                    onPressed: () {
-                      Scaffold.of(context).openEndDrawer();
-                    },
-                  ))
+                      child: kIsWeb
+                          ? Container(
+                              width: MediaQuery.of(context).size.width * 1 / 4,
+                              height: 1000,
+                              child: Column(children: _shoppingListWidget))
+                          : IconButton(
+                              icon: Icon(Icons.arrow_back_ios_sharp),
+                              onPressed: () {
+                                Scaffold.of(context).openEndDrawer();
+                              },
+                            ))
                 ]))));
   }
 
@@ -192,16 +210,15 @@ class _ShopState extends State<Shop> {
             onPressed: () => {},
             child: Column(children: [
               Spacer(),
-              Text(
+            FittedBox(
+                fit: BoxFit.fitWidth,
+                child: Text(
                 _product.name,
-                style: TextStyle(
-                    color: Colors.white,
-                    fontSize: MediaQuery.of(context).size.width / 30),
+                style: TextStyle(color: Colors.white),
                 textAlign: TextAlign.center,
-              ),
-              SizedBox(
-                  height: MediaQuery.of(context).size.width / 7,
-                  width: MediaQuery.of(context).size.width / 7,
+              )),
+              FittedBox(
+                  fit: BoxFit.fitWidth,
                   child: Image.asset(_product.image)),
               Row(children: [
                 ElevatedButton(
