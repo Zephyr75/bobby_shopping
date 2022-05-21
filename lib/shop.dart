@@ -3,6 +3,7 @@ import 'package:bobby_shopping/product.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import 'common.dart';
 import 'custom_colors.dart';
@@ -93,6 +94,13 @@ class _ShopState extends State<Shop> {
     }
     FirebaseApi.getCommands();
     _shoppingList.clear();
+    final snackBar = SnackBar(
+      duration: const Duration(seconds: 2),
+      backgroundColor: CustomColors.currentColor,
+      content: Text("Order sent", style: GoogleFonts.comfortaa(fontSize: 20, color: Colors.white)),
+    );
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
   _rebuildFavorites() {

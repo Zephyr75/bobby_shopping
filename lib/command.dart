@@ -1,3 +1,4 @@
+import 'package:bobby_shopping/custom_colors.dart';
 import 'package:bobby_shopping/product.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -34,7 +35,7 @@ ExpansionPanel commandExpansionPanel(Command _command) {
               height: 100,
               width: 1000,
               child: Center(child: Text(DateFormat().format(_command.date.toDate()), style: TextStyle(color: Colors.white, fontSize: 20),)),
-              color: Colors.blueGrey.shade200),
+              color: Colors.cyan.shade300),
       body:
           Container(
               height: 200,

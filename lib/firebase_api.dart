@@ -89,6 +89,7 @@ class FirebaseApi {
         Common.allCommands.add(temp);
       }
     }
+    Common.allCommands.sort((a, b) => b.date.compareTo(a.date));
   }
 
   //Add favorite to the favorites list on the database

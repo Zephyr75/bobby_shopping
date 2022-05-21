@@ -17,7 +17,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
   void initState() {
     super.initState();
     Future.delayed(
-        const Duration(seconds: 0),
+        const Duration(seconds: 2),
             () => Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => FirebaseApi.isLoggedIn() ? MainMenu() : SignIn()),
