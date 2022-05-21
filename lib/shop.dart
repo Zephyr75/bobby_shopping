@@ -184,6 +184,7 @@ class _ShopState extends State<Shop> {
             builder: (context) => SizedBox(
                 width: MediaQuery.of(context).size.width,
                 child: Row(children: [
+                  Spacer(),
                   SizedBox(
                     width: _width,
                     child: CustomScrollView(slivers: [
@@ -227,7 +228,8 @@ class _ShopState extends State<Shop> {
                               onPressed: () {
                                 Scaffold.of(context).openEndDrawer();
                               },
-                            ))
+                            )),
+                  Spacer(),
                 ]))));
   }
 
