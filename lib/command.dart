@@ -1,13 +1,14 @@
 import 'package:bobby_shopping/product.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class Command{
   bool isExpanded = false;
-  List<Product> products = [];
-  DateTime date;
+  List<String> products = [];
+  Timestamp date;
 
-  Command(this.products, this.date);
+  Command(this.date);
 }
 
 ExpansionPanel commandExpansionPanel(Command _command) {
@@ -16,7 +17,7 @@ ExpansionPanel commandExpansionPanel(Command _command) {
           Container(
               height: 100,
               width: 1000,
-              child: Center(child: Text(DateFormat().format(_command.date), style: TextStyle(color: Colors.white, fontSize: 20),)),
+              child: Center(child: Text(DateFormat().format(_command.date.toDate()), style: TextStyle(color: Colors.white, fontSize: 20),)),
               color: Colors.blueGrey.shade200),
       body:
           Container(
@@ -24,8 +25,7 @@ ExpansionPanel commandExpansionPanel(Command _command) {
               width: 1000,
               child: Center(child: Column(children: [
                 Spacer(),
-                Text("1 carrot", style: TextStyle(fontSize: 20, color: Colors.grey.shade700)),
-                Text("2 apples", style: TextStyle(fontSize: 20, color: Colors.grey.shade700)),
+                Text(_command.products.first),
                 Spacer(),
               ],)),
               color: Colors.white),

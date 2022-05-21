@@ -35,7 +35,6 @@ class _ShopState extends State<Shop> {
         _rebuildFavorites();
       }
       _favoritesDisplayed = !_favoritesDisplayed;
-      print("favorites displayed → " + _favoritesDisplayed.toString());
     });
   }
 
@@ -78,6 +77,20 @@ class _ShopState extends State<Shop> {
         }
       }
     });
+  }
+
+  _onPressedOrder(){
+    for (var _a in Common.allProducts) {
+      int _count = 0;
+      for (var _b in _shoppingList) {
+        if (_a.name == _b.name) {
+          _count++;
+        }
+      }
+      if (_count > 0) {
+        FirebaseApi.addOrder(_a, _count);
+      }
+    }
   }
 
   _rebuildFavorites() {
@@ -125,7 +138,7 @@ class _ShopState extends State<Shop> {
               ),
               const Spacer(),
               ElevatedButton.icon(
-                onPressed: () {},
+                onPressed: _onPressedOrder,
                 label: const Text("Order",
                     style: TextStyle(color: Colors.black, fontSize: 18)),
                 icon:

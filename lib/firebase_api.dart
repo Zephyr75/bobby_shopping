@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 
+import 'command.dart';
 import 'common.dart';
 
 
@@ -35,8 +36,8 @@ class FirebaseApi {
   ///Basic Email+password signIn (found on FirebaseAuth doc)
   static Future<void> signIn(String email, String password) async {
     try {
-      UserCredential userCredential = await FirebaseAuth.instance
-          .signInWithEmailAndPassword(email: email, password: password);
+      UserCredential userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(email: email, password: password);
+      getCommands();
     } on FirebaseAuthException catch (e) {
       //TODO exceptions
       if (e.code == 'user-not-found') {
@@ -52,6 +53,46 @@ class FirebaseApi {
     return auth.currentUser != null;
   }
 
+  //Add favorite to the favorites list on the database
+  static Future<void> addOrder(Product _product, int _count) async {
+    return orders
+        .doc()
+        .set({
+      "User": auth.currentUser?.uid,
+      "Product": _product.name,
+      "Count": _count,
+      "Date": DateTime.now()
+    })
+        .then((value) => print("Order added"))
+        .catchError((error) => print("Failed to add order: $error"));
+  }
+
+  //Add previous commands to the commands list from the database
+  static Future<void> getCommands() async {
+    QuerySnapshot querySnapshot = await orders.get();
+    final allData = querySnapshot.docs.toList();
+    for (var order in allData) {
+      Timestamp tempTime = order.get("Date");
+      Command temp = Command(tempTime);
+      bool _neverSeen = true;
+      for (var command in Common.allCommands){
+        if (command.date.toDate().difference(tempTime.toDate()).inMinutes.abs() < 2){
+          command.products.add(order.get("Product"));
+          _neverSeen = false;
+        }
+      }
+      if (_neverSeen){
+        for (int i = 0; i < order.get("Count"); i++){
+          temp.products.add(order.get("Product"));
+        }
+        Common.allCommands.add(temp);
+      }
+    }
+
+
+
+
+  }
 
   //Add favorite to the favorites list on the database
   static Future<void> addFavorite(Product _product) async {
@@ -90,7 +131,7 @@ class FirebaseApi {
   //Gets product information from the database
   static Future<void> getProducts() async {
     QuerySnapshot querySnapshot = await products.get();
-    final allData = querySnapshot.docs.map((doc) => doc).toList();
+    final allData = querySnapshot.docs.toList();
     for (var product in allData) {
       Product temp = Product(
           product.id,
