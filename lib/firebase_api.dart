@@ -78,7 +78,9 @@ class FirebaseApi {
       bool _neverSeen = true;
       for (var command in Common.allCommands){
         if (command.date.toDate().difference(tempTime.toDate()).inSeconds.abs() < 2){
-          command.products.add(order.get("Product"));
+          for (int i = 0; i < order.get("Count"); i++){
+            command.products.add(order.get("Product"));
+          }
           _neverSeen = false;
         }
       }

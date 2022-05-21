@@ -78,6 +78,13 @@ class _ShopState extends State<Shop> {
         }
       }
     });
+    final snackBar = SnackBar(
+      duration: const Duration(seconds: 2),
+      backgroundColor: CustomColors.currentColor,
+      content: Text("Added to shopping list", style: GoogleFonts.comfortaa(fontSize: 20, color: Colors.white)),
+    );
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
   _onPressedOrder(){
@@ -89,6 +96,7 @@ class _ShopState extends State<Shop> {
         }
       }
       if (_count > 0) {
+        print(_count);
         FirebaseApi.addOrder(_a, _count);
       }
     }
@@ -210,11 +218,12 @@ class _ShopState extends State<Shop> {
                   ),
                   Center(
                       child: kIsWeb
-                          ? Container(
-                              color: Colors.grey.shade200,
+                          ? Material(
+                          elevation: 20,
+                          child: Container(
                               width: MediaQuery.of(context).size.width * 1 / 4,
                               height: 1000,
-                              child: Column(children: _shoppingListWidget))
+                              child: Column(children: _shoppingListWidget)))
                           : IconButton(
                               icon: Icon(Icons.arrow_back_ios_sharp),
                               onPressed: () {
