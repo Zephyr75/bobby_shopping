@@ -59,15 +59,11 @@ Future<void> main() async {
 
   FirebaseApi.signIn("bobby@epfl.ch", "123456");
 
-  FirebaseApi.addProduct("Banana", 5);
+  FirebaseApi.addProduct("Banana", 10, "graphics/banana.png", "yellow");
+  FirebaseApi.addProduct("Peach", 5, "graphics/peach.png", "red");
+  FirebaseApi.addProduct("Pear", 3, "graphics/pear.png", "green");
+  FirebaseApi.addProduct("Apple", 2, "graphics/apple.png", "green");
   FirebaseApi.getProducts();
-
-  Product carrot = Product("Banana", "graphics/carrot.png", Colors.yellow.shade200, Colors.yellow.shade600);
-  Product apple = Product("Apple", "graphics/carrot.png", Colors.green.shade200, Colors.green.shade600);
-
-  Common.allCommands.add(Command([carrot, carrot], DateTime.now()));
-  Common.allCommands.add(Command([carrot, apple], DateTime.now()));
-  Common.allCommands.add(Command([apple, apple], DateTime.now()));
 
   runApp(MyApp());
 }
@@ -149,7 +145,7 @@ class _MainMenuState extends State<MainMenu> {
                 color: Colors.white,
                 size: 20,
               ),
-              label: const Text(" Sign out", style: TextStyle(fontSize: 20), textAlign: TextAlign.center),
+              label: const Text(" Sign out", style: TextStyle(fontSize: 18), textAlign: TextAlign.center),
               style: ElevatedButton.styleFrom(
                   primary: CustomColors.redColor.shade900,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),

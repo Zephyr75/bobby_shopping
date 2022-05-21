@@ -18,7 +18,7 @@ class _SignInState extends State<SignIn> {
   final _passwordController = TextEditingController();
 
   Future<void> logUserAndClear() async {
-    await FirebaseApi.signUp(_emailController.text, _passwordController.text);
+    await FirebaseApi.signIn(_emailController.text, _passwordController.text);
     FocusScope.of(context).unfocus();
     _emailController.clear();
     _passwordController.clear();

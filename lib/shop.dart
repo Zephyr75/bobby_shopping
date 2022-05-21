@@ -1,8 +1,10 @@
+import 'package:bobby_shopping/firebase_api.dart';
 import 'package:bobby_shopping/product.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 
+import 'common.dart';
 import 'custom_colors.dart';
 
 class Shop extends StatefulWidget {
@@ -38,6 +40,12 @@ class _ShopState extends State<Shop> {
   }
 
   _onPressedAddFavorite(Product _product) {
+    if (_product.inFavorites){
+      FirebaseApi.removeFavorite(_product);
+    }
+    else{
+      FirebaseApi.addFavorite(_product);
+    }
     setState(() {
       _product.inFavorites = !_product.inFavorites;
     });
@@ -55,7 +63,7 @@ class _ShopState extends State<Shop> {
             child: Text('Shopping list',
                 style: TextStyle(fontSize: 25, color: Colors.white))),
       ));
-      for (var _a in allProducts) {
+      for (var _a in Common.allProducts) {
         int _count = 0;
         for (var _b in _shoppingList) {
           if (_a.name == _b.name) {
@@ -75,9 +83,8 @@ class _ShopState extends State<Shop> {
   _rebuildFavorites() {
     setState(() {
       _favorites.clear();
-      for (var _product in allProducts) {
+      for (var _product in Common.allProducts) {
         if (_product.inFavorites) {
-          print("+1");
           _favorites.add(_product);
         }
       }
@@ -92,6 +99,7 @@ class _ShopState extends State<Shop> {
 
   @override
   Widget build(BuildContext context) {
+    double _width = kIsWeb ? MediaQuery.of(context).size.width * 3 / 4 : MediaQuery.of(context).size.width - 50;
     return Scaffold(
         appBar: AppBar(
           actions: [
@@ -142,7 +150,7 @@ class _ShopState extends State<Shop> {
                 width: MediaQuery.of(context).size.width,
                 child: Row(children: [
                   SizedBox(
-                    width: kIsWeb ? MediaQuery.of(context).size.width * 3 / 4 : MediaQuery.of(context).size.width - 50,
+                    width: _width,
                     child: CustomScrollView(slivers: [
                       SliverPadding(
                           padding: const EdgeInsets.only(
@@ -154,27 +162,20 @@ class _ShopState extends State<Shop> {
                                     context,
                                     _favoritesDisplayed
                                         ? _favorites[index]
-                                        : allProducts[index]);
+                                        : Common.allProducts[index]);
                               },
                               childCount: _favoritesDisplayed
                                   ? _favorites.length
-                                  : allProducts.length,
+                                  : Common.allProducts.length,
                             ),
                             gridDelegate:
                                 SliverGridDelegateWithFixedCrossAxisCount(
                               crossAxisCount:
-                                  MediaQuery.of(context).size.width * 3 / 4 >
-                                          1000
+                                  _width > 600
                                       ? 4
-                                      : (MediaQuery.of(context).size.width *
-                                                  3 /
-                                                  4 >
-                                              600
+                                      : (_width > 400
                                           ? 3
-                                          : (MediaQuery.of(context).size.width *
-                                                      3 /
-                                                      4 >
-                                                  200
+                                          : (_width > 200
                                               ? 2
                                               : 1)),
                               mainAxisSpacing: 10,

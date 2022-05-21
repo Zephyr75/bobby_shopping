@@ -1,18 +1,19 @@
 import 'dart:io';
-import 'dart:math';
-import 'dart:typed_data';
+import 'package:bobby_shopping/product.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:firebase_core/firebase_core.dart' as firebase_core;
 
-//TODO: Trouver un moyen clean de faire une ref static/ Exceptions/ Link à firebase storage quand on aura les jeux
+import 'common.dart';
 
 
 class FirebaseApi {
   static Future<Directory> appDocDir = getApplicationDocumentsDirectory();
   static FirebaseAuth auth = FirebaseAuth.instance;
   static CollectionReference products = FirebaseFirestore.instance.collection('products');
+  static CollectionReference favorites = FirebaseFirestore.instance.collection('favorites');
+  static CollectionReference orders = FirebaseFirestore.instance.collection('orders');
 
 
   ///Basic Email+password signUp (found on FirebaseAuth doc)
@@ -51,12 +52,36 @@ class FirebaseApi {
     return auth.currentUser != null;
   }
 
-  //Add product to the products list on the databse
-  static Future<void> addProduct(String _name, int _price) async {
+
+  //Add favorite to the favorites list on the database
+  static Future<void> addFavorite(Product _product) async {
+    return favorites
+        .doc()
+        .set({
+      "User": auth.currentUser?.uid,
+      "Product": _product.name,
+    })
+        .then((value) => print("Favorite added"))
+        .catchError((error) => print("Failed to add favorite: $error"));
+  }
+
+  //Remove favorite from the favorites list on the database
+  static Future<void> removeFavorite(Product _product) async {
+    QuerySnapshot snapshot = await favorites
+        .where('Product', isEqualTo: _product.name)
+        .where('User', isEqualTo: auth.currentUser?.uid)
+        .get();
+    snapshot.docs.first.reference.delete();
+  }
+
+  //Add product to the products list on the database
+  static Future<void> addProduct(String _name, int _price, String _image, String _color) async {
     return products
         .doc(_name)
         .set({
       "Price": _price,
+      "Image": _image,
+      "Color": _color,
     })
         .then((value) => print("Product added"))
         .catchError((error) => print("Failed to add product: $error"));
@@ -67,7 +92,37 @@ class FirebaseApi {
     QuerySnapshot querySnapshot = await products.get();
     final allData = querySnapshot.docs.map((doc) => doc).toList();
     for (var product in allData) {
-      print(product.get("Price").toString());
+      Product temp = Product(
+          product.id,
+          product.get("Price"),
+          product.get("Image"),
+          getPrimary(product.get("Color")),
+          getSecondary(product.get("Color")));
+      QuerySnapshot snapshot = await favorites
+          .where('Product', isEqualTo: temp.name)
+          .where('User', isEqualTo: auth.currentUser?.uid)
+          .get();
+      if (snapshot.size > 0){
+        temp.inFavorites = true;
+      }
+      Common.allProducts.add(temp);
+    }
+  }
+
+
+  static Color getPrimary(String _name){
+    switch(_name){
+      case 'red' : return Colors.red.shade200;
+      case 'green' : return Colors.green.shade200;
+      default : return Colors.yellow.shade200;
+    }
+  }
+
+  static Color getSecondary(String _name){
+    switch(_name){
+      case 'red' : return Colors.red.shade600;
+      case 'green' : return Colors.green.shade600;
+      default : return Colors.yellow.shade600;
     }
   }
 
