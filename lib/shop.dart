@@ -26,7 +26,9 @@ class _ShopState extends State<Shop> {
       ),
       child: Center(
           child: Text('Shopping list',
-              style: TextStyle(fontSize: 25, color: Colors.white))),
+            style: TextStyle(fontSize: 25, color: Colors.white),
+            textAlign: TextAlign.center,
+          )),
     )
   ];
 
@@ -61,7 +63,9 @@ class _ShopState extends State<Shop> {
         ),
         child: Center(
             child: Text('Shopping list',
-                style: TextStyle(fontSize: 25, color: Colors.white))),
+              style: TextStyle(fontSize: 25, color: Colors.white),
+              textAlign: TextAlign.center,
+            )),
       ));
       for (var _a in Common.allProducts) {
         int _count = 0;
@@ -130,7 +134,7 @@ class _ShopState extends State<Shop> {
 
   @override
   Widget build(BuildContext context) {
-    double _width = kIsWeb ? MediaQuery.of(context).size.width * 3 / 4 : MediaQuery.of(context).size.width - 50;
+    double _width = kIsWeb ? MediaQuery.of(context).size.width * 3 / 4 : MediaQuery.of(context).size.width;
     return Scaffold(
         appBar: AppBar(
           actions: [
@@ -168,7 +172,7 @@ class _ShopState extends State<Shop> {
               )
             ])),
         floatingActionButtonLocation: FloatingActionButtonLocation.endTop,
-        endDrawer: kIsWeb
+        endDrawer: kIsWeb && MediaQuery.of(context).size.width > 700
             ? null
             : Drawer(
                 child: ListView(
@@ -202,13 +206,7 @@ class _ShopState extends State<Shop> {
                             gridDelegate:
                                 SliverGridDelegateWithFixedCrossAxisCount(
                               crossAxisCount:
-                                  _width > 600
-                                      ? 4
-                                      : (_width > 400
-                                          ? 3
-                                          : (_width > 200
-                                              ? 2
-                                              : 1)),
+                                  _width > 700 ? 4 : (_width > 500 ? 3 : 2),
                               mainAxisSpacing: 10,
                               crossAxisSpacing: 10,
                               childAspectRatio: 1.0,
@@ -217,7 +215,7 @@ class _ShopState extends State<Shop> {
                     ]),
                   ),
                   Center(
-                      child: kIsWeb
+                      child: kIsWeb && MediaQuery.of(context).size.width > 700
                           ? Material(
                           elevation: 20,
                           child: Container(
