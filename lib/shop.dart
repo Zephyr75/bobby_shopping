@@ -187,6 +187,7 @@ class _ShopState extends State<Shop> {
                   Center(
                       child: kIsWeb
                           ? Container(
+                              color: Colors.grey.shade200,
                               width: MediaQuery.of(context).size.width * 1 / 4,
                               height: 1000,
                               child: Column(children: _shoppingListWidget))
