@@ -69,6 +69,7 @@ class FirebaseApi {
 
   //Add previous commands to the commands list from the database
   static Future<void> getCommands() async {
+    Common.allCommands.clear();
     QuerySnapshot querySnapshot = await orders.get();
     final allData = querySnapshot.docs.toList();
     for (var order in allData) {
@@ -76,7 +77,7 @@ class FirebaseApi {
       Command temp = Command(tempTime);
       bool _neverSeen = true;
       for (var command in Common.allCommands){
-        if (command.date.toDate().difference(tempTime.toDate()).inMinutes.abs() < 2){
+        if (command.date.toDate().difference(tempTime.toDate()).inSeconds.abs() < 2){
           command.products.add(order.get("Product"));
           _neverSeen = false;
         }
@@ -88,10 +89,6 @@ class FirebaseApi {
         Common.allCommands.add(temp);
       }
     }
-
-
-
-
   }
 
   //Add favorite to the favorites list on the database

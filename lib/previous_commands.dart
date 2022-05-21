@@ -38,8 +38,15 @@ class _PreviousCommandsState extends State<PreviousCommands> {
         body: SingleChildScrollView(child: Center(child:
       Container(width: 1000, height: 1000, alignment: Alignment.center, child: ListView(children: [ExpansionPanelList(
         children: result,
-        expansionCallback: (i, isOpen) => setState(() {
-          Common.allCommands[i].isExpanded = !Common.allCommands[i].isExpanded;
+        expansionCallback: (j, isOpen) => setState(() {
+          for (int i = 0; i < Common.allCommands.length; i++){
+            if (i == j){
+              Common.allCommands[i].isExpanded = !Common.allCommands[i].isExpanded;
+            }
+            else{
+              Common.allCommands[i].isExpanded = false;
+            }
+          }
         })
     )])))));
   }

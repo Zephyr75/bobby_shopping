@@ -91,6 +91,8 @@ class _ShopState extends State<Shop> {
         FirebaseApi.addOrder(_a, _count);
       }
     }
+    FirebaseApi.getCommands();
+    _shoppingList.clear();
   }
 
   _rebuildFavorites() {
