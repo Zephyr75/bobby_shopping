@@ -18,7 +18,6 @@ class Shop extends StatefulWidget {
 class _ShopState extends State<Shop> {
   List<Product> _favorites = [];
   bool _favoritesDisplayed = false;
-  List<Product> _shoppingList = [];
   List<Widget> _shoppingListWidget = [
     DrawerHeader(
       decoration: BoxDecoration(
@@ -55,7 +54,7 @@ class _ShopState extends State<Shop> {
 
   _onPressedPlus(Product _product) {
     setState(() {
-      _shoppingList.add(_product);
+      Common.shoppingList.add(_product);
       _shoppingListWidget.clear();
       _shoppingListWidget.add(DrawerHeader(
         decoration: BoxDecoration(
@@ -69,7 +68,7 @@ class _ShopState extends State<Shop> {
       ));
       for (var _a in Common.allProducts) {
         int _count = 0;
-        for (var _b in _shoppingList) {
+        for (var _b in Common.shoppingList) {
           if (_a.name == _b.name) {
             _count++;
           }
@@ -82,13 +81,12 @@ class _ShopState extends State<Shop> {
         }
       }
     });
-    Common.showSnackBar(context, "Added to shopping list");
   }
 
   _onPressedOrder(){
     for (var _a in Common.allProducts) {
       int _count = 0;
-      for (var _b in _shoppingList) {
+      for (var _b in Common.shoppingList) {
         if (_a.name == _b.name) {
           _count++;
         }
@@ -99,7 +97,7 @@ class _ShopState extends State<Shop> {
       }
     }
     FirebaseApi.getCommands();
-    _shoppingList.clear();
+    Common.shoppingList.clear();
     Common.showSnackBar(context, "Order sent");
   }
 
@@ -232,7 +230,7 @@ class _ShopState extends State<Shop> {
               SizedBox(height: 10),
               Text(
                 _product.name,
-                style: TextStyle(color: Colors.white, fontSize: 30),
+                style: TextStyle(color: Colors.white, fontSize: 25),
                 textAlign: TextAlign.center,
               ),
               Expanded(child: Image.asset(_product.image)),

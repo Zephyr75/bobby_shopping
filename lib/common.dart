@@ -11,6 +11,8 @@ class Common{
 
   static List<Command> allCommands = [];
 
+  static List<Product> shoppingList = [];
+
   ///Display pop-up at the bottom of the screen
   static showSnackBar(BuildContext _context, String _text) {
     final snackBar = SnackBar(

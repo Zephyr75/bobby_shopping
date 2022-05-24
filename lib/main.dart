@@ -124,6 +124,7 @@ class _MainMenuState extends State<MainMenu> {
           ElevatedButton.icon(
               onPressed: () {
                 FirebaseApi.auth.signOut();
+                Common.shoppingList.clear();
                 Common.goToTarget(context, const SignIn());
               },
                 icon: const Icon(

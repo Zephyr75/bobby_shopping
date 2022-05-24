@@ -35,8 +35,9 @@ class _PreviousCommandsState extends State<PreviousCommands> {
             onPressed: () => Navigator.of(context).pop(),
           ),
         ),
-        body: SingleChildScrollView(child: Center(child:
-      Container(width: 1000, height: 1000, alignment: Alignment.center, child: ListView(children: [ExpansionPanelList(
+        body: SingleChildScrollView(
+            child: Container(
+                child: ExpansionPanelList(
         children: result,
         expansionCallback: (j, isOpen) => setState(() {
           for (int i = 0; i < Common.allCommands.length; i++){
@@ -48,6 +49,6 @@ class _PreviousCommandsState extends State<PreviousCommands> {
             }
           }
         })
-    )])))));
+    ))));
   }
 }
