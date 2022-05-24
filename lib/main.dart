@@ -38,18 +38,6 @@ class Achievement {
 }
 
 Future<void> main() async {
-  /*var path =
-      "C:/Users/antoi/AppData/LocalLow/DefaultCompany/Achievements/achievements.json";
-  File(path)
-      .openRead()
-      .transform(utf8.decoder)
-      .transform(new LineSplitter())
-      .forEach((l) {
-    Map<String, dynamic> achievementMap = jsonDecode(l);
-    var achievement = Achievement.fromJson(achievementMap);
-
-    print(achievement.label);
-  });*/
 
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -57,12 +45,7 @@ Future<void> main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  FirebaseApi.signIn("bobby@epfl.ch", "123456");
-
-  FirebaseApi.addProduct("Banana", 10, "graphics/banana.png", "yellow");
-  FirebaseApi.addProduct("Peach", 5, "graphics/peach.png", "red");
-  FirebaseApi.addProduct("Pear", 3, "graphics/pear.png", "green");
-  FirebaseApi.addProduct("Apple", 2, "graphics/apple.png", "green");
+  //FirebaseApi.addProduct("Banana", 10, "graphics/banana.png", "yellow");
   FirebaseApi.getProducts();
 
   runApp(MyApp());
@@ -139,18 +122,21 @@ class _MainMenuState extends State<MainMenu> {
                   fixedSize: const Size(300, 100))),
           Spacer(),
           ElevatedButton.icon(
-              onPressed: () => Common.goToTarget(context, const SignIn()),
-              icon: const Icon(
+              onPressed: () {
+                FirebaseApi.auth.signOut();
+                Common.goToTarget(context, const SignIn());
+              },
+                icon: const Icon(
                 Octicons.sign_out,
                 color: Colors.white,
                 size: 20,
-              ),
-              label: const Text(" Sign out", style: TextStyle(fontSize: 18), textAlign: TextAlign.center),
-              style: ElevatedButton.styleFrom(
-                  primary: CustomColors.redColor.shade900,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
-                  fixedSize: const Size(150, 50))),
-          Spacer(flex: 2),
+                ),
+                label: const Text(" Sign out", style: TextStyle(fontSize: 18), textAlign: TextAlign.center),
+                style: ElevatedButton.styleFrom(
+                primary: CustomColors.redColor.shade900,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
+                fixedSize: const Size(150, 50))),
+                Spacer(flex: 2),
         ],
       )),
     );

@@ -82,13 +82,7 @@ class _ShopState extends State<Shop> {
         }
       }
     });
-    final snackBar = SnackBar(
-      duration: const Duration(seconds: 2),
-      backgroundColor: CustomColors.currentColor,
-      content: Text("Added to shopping list", style: GoogleFonts.comfortaa(fontSize: 20, color: Colors.white)),
-    );
-    ScaffoldMessenger.of(context).hideCurrentSnackBar();
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    Common.showSnackBar(context, "Added to shopping list");
   }
 
   _onPressedOrder(){
@@ -106,13 +100,7 @@ class _ShopState extends State<Shop> {
     }
     FirebaseApi.getCommands();
     _shoppingList.clear();
-    final snackBar = SnackBar(
-      duration: const Duration(seconds: 2),
-      backgroundColor: CustomColors.currentColor,
-      content: Text("Order sent", style: GoogleFonts.comfortaa(fontSize: 20, color: Colors.white)),
-    );
-    ScaffoldMessenger.of(context).hideCurrentSnackBar();
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    Common.showSnackBar(context, "Order sent");
   }
 
   _rebuildFavorites() {

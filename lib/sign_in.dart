@@ -3,6 +3,7 @@ import 'package:bobby_shopping/sign_up.dart';
 import 'package:flutter/material.dart';
 
 import 'common.dart';
+import 'custom_colors.dart';
 import 'firebase_api.dart';
 
 class SignIn extends StatefulWidget {
@@ -18,11 +19,19 @@ class _SignInState extends State<SignIn> {
   final _passwordController = TextEditingController();
 
   Future<void> logUserAndClear() async {
-    await FirebaseApi.signIn(_emailController.text, _passwordController.text);
-    FocusScope.of(context).unfocus();
-    _emailController.clear();
-    _passwordController.clear();
-    Common.goToTarget(context, const MainMenu());
+    await FirebaseApi.signIn(_emailController.text, _passwordController.text, context);
+    if (FirebaseApi.isLoggedIn()) {
+      FocusScope.of(context).unfocus();
+      _emailController.clear();
+      _passwordController.clear();
+      Common.goToTarget(context, const MainMenu());
+    }
+  }
+
+  @override
+  void initState() {
+    CustomColors.currentColor = CustomColors.greyColor.shade900;
+    super.initState();
   }
 
   @override

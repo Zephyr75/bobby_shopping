@@ -18,33 +18,24 @@ class FirebaseApi {
 
 
   ///Basic Email+password signUp (found on FirebaseAuth doc)
-  static Future<void> signUp(String email, String password) async {
+  static Future<void> signUp(String email, String password, BuildContext context) async {
     try {
-      UserCredential userCredential = await FirebaseAuth.instance
-          .createUserWithEmailAndPassword(email: email, password: password);
+      UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(email: email, password: password);
+      await signIn(email, password, context);
     } on FirebaseAuthException catch (e) {
-      if (e.code == 'weak-password') {
-        print('The password provided is too weak.');
-      } else if (e.code == 'email-already-in-use') {
-        print('The account already exists for that email.');
-      }
+      Common.showSnackBar(context, 'Invalid email address');
     } catch (e) {
       print(e);
     }
   }
 
   ///Basic Email+password signIn (found on FirebaseAuth doc)
-  static Future<void> signIn(String email, String password) async {
+  static Future<void> signIn(String email, String password, BuildContext context) async {
     try {
       UserCredential userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(email: email, password: password);
       getCommands();
     } on FirebaseAuthException catch (e) {
-      //TODO exceptions
-      if (e.code == 'user-not-found') {
-        print('No user found for that email.');
-      } else if (e.code == 'wrong-password') {
-        print('Wrong password provided for that user.');
-      }
+      Common.showSnackBar(context, 'No user found');
     }
   }
 
@@ -70,7 +61,7 @@ class FirebaseApi {
   //Add previous commands to the commands list from the database
   static Future<void> getCommands() async {
     Common.allCommands.clear();
-    QuerySnapshot querySnapshot = await orders.get();
+    QuerySnapshot querySnapshot = await orders.where('User', isEqualTo: auth.currentUser?.uid).get();
     final allData = querySnapshot.docs.toList();
     for (var order in allData) {
       Timestamp tempTime = order.get("Date");
