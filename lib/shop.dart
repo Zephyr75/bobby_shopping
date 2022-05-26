@@ -126,7 +126,7 @@ class _ShopState extends State<Shop> {
         if (_totalCount > 0) {
           _shoppingListWidget.add(ListTile(
               title: Center(
-                  child: Text("$_totalCount ${_a.name} ($_receivedCount/$_totalCount processed)",
+                  child: Text("$_totalCount ${_a.name} ($_receivedCount/$_totalCount done)",
                       style: TextStyle(fontSize: 20)))));
         }
       }
@@ -139,7 +139,9 @@ class _ShopState extends State<Shop> {
   }
 
   _onPressedOrder() {
-    Common.isOrdering = true;
+    setState(() {
+      Common.isOrdering = true;
+    });
     for (var _a in Common.allProducts) {
       int _count = 0;
       for (var _b in Common.shoppingList) {
@@ -148,13 +150,14 @@ class _ShopState extends State<Shop> {
         }
       }
       if (_count > 0) {
-        print(_count);
         FirebaseApi.addOrder(_a, _count);
       }
     }
     FirebaseApi.getCommands();
     _sendUDP();
     _receiveUDP();
+    _onProductConfirmed(Common.allProducts[0]);
+    _onProductConfirmed(Common.allProducts[1]);
     Common.showSnackBar(context, "Order sent");
   }
 
@@ -196,28 +199,28 @@ class _ShopState extends State<Shop> {
           ),
         ),
         floatingActionButton: SizedBox(
-            width: 200,
+            width: 220,
             child: Row(children: [
               FloatingActionButton(
                 onPressed: _onPressedSeeFavorites,
                 child: Icon(Icons.favorite,
-                    color:
-                        _favoritesDisplayed ? Colors.redAccent : Colors.black),
+                    color: _favoritesDisplayed ? Colors.redAccent : Colors.black),
               ),
               const Spacer(),
-              ElevatedButton.icon(
+            Builder(
+                builder: (context) => ElevatedButton.icon(
                 onPressed: Common.isOrdering
                     ? () => Scaffold.of(context).openEndDrawer()
                     : _onPressedOrder,
-                label: Text(Common.isOrdering ? "See progress" : "Order",
+                label: Text(Common.isOrdering ? "Loading..." : "Order",
                     style: TextStyle(color: Colors.black, fontSize: 18)),
                 icon:
                     const Icon(FontAwesome.shopping_cart, color: Colors.black),
                 style: ElevatedButton.styleFrom(
                     shape: const StadiumBorder(),
-                    fixedSize: const Size(130, 55),
+                    fixedSize: const Size(160, 55),
                     primary: Colors.white),
-              )
+              ))
             ])),
         floatingActionButtonLocation: FloatingActionButtonLocation.endTop,
         endDrawer: kIsWeb && MediaQuery.of(context).size.width > 700
@@ -316,7 +319,7 @@ class _ShopState extends State<Shop> {
                     shape: const CircleBorder(),
                     fixedSize: const Size(40, 40),
                   ),
-                  onPressed: () => _onPressedPlus(_product),
+                  onPressed: Common.isOrdering ? null : () => _onPressedPlus(_product),
                   child: const Icon(Icons.add, color: Colors.black)),
               Spacer(),
             ]),
