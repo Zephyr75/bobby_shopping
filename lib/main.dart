@@ -45,7 +45,10 @@ Future<void> main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  //FirebaseApi.addProduct("Banana", 10, "graphics/banana.png", "yellow");
+  FirebaseApi.addProduct("Banana", 10, "graphics/banana.png", "yellow");
+  FirebaseApi.addProduct("Peach", 5, "graphics/peach.png", "red");
+  FirebaseApi.addProduct("Apple", 1, "graphics/apple.png", "green");
+  FirebaseApi.addProduct("Pear", 3, "graphics/pear.png", "green");
   FirebaseApi.getProducts();
 
   runApp(MyApp());

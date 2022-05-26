@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:bobby_shopping/firebase_api.dart';
 import 'package:bobby_shopping/product.dart';
 import 'package:flutter/foundation.dart';
@@ -18,18 +21,7 @@ class Shop extends StatefulWidget {
 class _ShopState extends State<Shop> {
   List<Product> _favorites = [];
   bool _favoritesDisplayed = false;
-  List<Widget> _shoppingListWidget = [
-    DrawerHeader(
-      decoration: BoxDecoration(
-        color: CustomColors.greenColor.shade900,
-      ),
-      child: Center(
-          child: Text('Shopping list',
-            style: TextStyle(fontSize: 25, color: Colors.white),
-            textAlign: TextAlign.center,
-          )),
-    )
-  ];
+  List<Widget> _shoppingListWidget = [];
 
   _onPressedSeeFavorites() {
     setState(() {
@@ -40,11 +32,44 @@ class _ShopState extends State<Shop> {
     });
   }
 
+  _sendUDP() {
+    RawDatagramSocket.bind(InternetAddress.anyIPv4, 1234)
+        .then((RawDatagramSocket socket) {
+      socket.broadcastEnabled = true;
+      socket.send(
+        '{"tomato": "3","potato": "1","carrot": "2"}'.codeUnits,
+        InternetAddress('192.168.43.3'),
+        1234,
+      );
+      socket.close();
+    });
+  }
+
+  _receiveUDP() {
+    RawDatagramSocket.bind(InternetAddress.anyIPv4, 1234)
+        .then((RawDatagramSocket socket) {
+      socket.broadcastEnabled = true;
+      socket.listen((e) {
+        Datagram? dg = socket.receive();
+        if (dg != null) {
+          String received = utf8.decode(dg.data);
+          if (received == "end"){
+            socket.close();
+          }
+          for (var _product in Common.allProducts){
+            if (received == _product.name){
+              _onProductConfirmed(_product);
+            }
+          }
+        }
+      });
+    });
+  }
+
   _onPressedAddFavorite(Product _product) {
-    if (_product.inFavorites){
+    if (_product.inFavorites) {
       FirebaseApi.removeFavorite(_product);
-    }
-    else{
+    } else {
       FirebaseApi.addFavorite(_product);
     }
     setState(() {
@@ -56,16 +81,7 @@ class _ShopState extends State<Shop> {
     setState(() {
       Common.shoppingList.add(_product);
       _shoppingListWidget.clear();
-      _shoppingListWidget.add(DrawerHeader(
-        decoration: BoxDecoration(
-          color: CustomColors.greenColor.shade900,
-        ),
-        child: Center(
-            child: Text('Shopping list',
-              style: TextStyle(fontSize: 25, color: Colors.white),
-              textAlign: TextAlign.center,
-            )),
-      ));
+      _shoppingListWidget.add(_header());
       for (var _a in Common.allProducts) {
         int _count = 0;
         for (var _b in Common.shoppingList) {
@@ -76,14 +92,54 @@ class _ShopState extends State<Shop> {
         if (_count > 0) {
           _shoppingListWidget.add(ListTile(
               title: Center(
-                  child: Text(_count.toString() + " " + _a.name,
+                  child: Text("$_count ${_a.name}",
                       style: TextStyle(fontSize: 20)))));
         }
       }
     });
   }
 
-  _onPressedOrder(){
+  _onProductConfirmed(Product _product) {
+    setState(() {
+      Common.receivedList.add(_product);
+      _shoppingListWidget.clear();
+      _shoppingListWidget.add(_header());
+      if (Common.receivedList.length == Common.shoppingList.length){
+        Common.receivedList.clear();
+        Common.shoppingList.clear();
+        Common.isOrdering = false;
+        return;
+      }
+      for (var _a in Common.allProducts) {
+        int _totalCount = 0;
+        int _receivedCount = 0;
+        for (var _b in Common.shoppingList) {
+          if (_a.name == _b.name) {
+            _totalCount++;
+          }
+        }
+        for (var _b in Common.receivedList) {
+          if (_a.name == _b.name) {
+            _receivedCount++;
+          }
+        }
+        if (_totalCount > 0) {
+          _shoppingListWidget.add(ListTile(
+              title: Center(
+                  child: Text("$_totalCount ${_a.name} ($_receivedCount/$_totalCount processed)",
+                      style: TextStyle(fontSize: 20)))));
+        }
+      }
+      _shoppingListWidget.add(Image.asset(
+        "graphics/loading.gif",
+        height: 125.0,
+        width: 125.0,
+      ));
+    });
+  }
+
+  _onPressedOrder() {
+    Common.isOrdering = true;
     for (var _a in Common.allProducts) {
       int _count = 0;
       for (var _b in Common.shoppingList) {
@@ -97,7 +153,8 @@ class _ShopState extends State<Shop> {
       }
     }
     FirebaseApi.getCommands();
-    Common.shoppingList.clear();
+    _sendUDP();
+    _receiveUDP();
     Common.showSnackBar(context, "Order sent");
   }
 
@@ -115,12 +172,15 @@ class _ShopState extends State<Shop> {
   @override
   void initState() {
     CustomColors.currentColor = CustomColors.greenColor.shade900;
+    _shoppingListWidget.add(_header());
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    double _width = kIsWeb ? MediaQuery.of(context).size.width * 3 / 4 : MediaQuery.of(context).size.width;
+    double _width = kIsWeb
+        ? MediaQuery.of(context).size.width * 3 / 4
+        : MediaQuery.of(context).size.width - 50;
     return Scaffold(
         appBar: AppBar(
           actions: [
@@ -146,8 +206,10 @@ class _ShopState extends State<Shop> {
               ),
               const Spacer(),
               ElevatedButton.icon(
-                onPressed: _onPressedOrder,
-                label: const Text("Order",
+                onPressed: Common.isOrdering
+                    ? () => Scaffold.of(context).openEndDrawer()
+                    : _onPressedOrder,
+                label: Text(Common.isOrdering ? "See progress" : "Order",
                     style: TextStyle(color: Colors.black, fontSize: 18)),
                 icon:
                     const Icon(FontAwesome.shopping_cart, color: Colors.black),
@@ -204,16 +266,15 @@ class _ShopState extends State<Shop> {
                   Center(
                       child: kIsWeb && MediaQuery.of(context).size.width > 700
                           ? Material(
-                          elevation: 20,
-                          child: Container(
-                              width: MediaQuery.of(context).size.width * 1 / 4,
-                              height: 1000,
-                              child: Column(children: _shoppingListWidget)))
+                              elevation: 20,
+                              child: Container(
+                                  width:
+                                      MediaQuery.of(context).size.width * 1 / 4,
+                                  height: 1000,
+                                  child: Column(children: _shoppingListWidget)))
                           : IconButton(
                               icon: Icon(Icons.arrow_back_ios_sharp),
-                              onPressed: () {
-                                Scaffold.of(context).openEndDrawer();
-                              },
+                              onPressed: () => Scaffold.of(context).openEndDrawer(),
                             )),
                   Spacer(),
                 ]))));
@@ -227,40 +288,40 @@ class _ShopState extends State<Shop> {
           width: 50,
           height: 50,
           child: Column(children: [
-              SizedBox(height: 10),
-              Text(
-                _product.name,
-                style: TextStyle(color: Colors.white, fontSize: 25),
-                textAlign: TextAlign.center,
-              ),
-              Expanded(child: Image.asset(_product.image)),
-              Row(children: [
-                Spacer(),
-                ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      primary: Colors.white,
-                      shape: const CircleBorder(),
-                      fixedSize: const Size(40, 40),
-                    ),
-                    onPressed: () => _onPressedAddFavorite(_product),
-                    child: Icon(
-                        _product.inFavorites
-                            ? Icons.favorite
-                            : Icons.favorite_border,
-                        color: Colors.redAccent)),
-                Spacer(),
-                ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      primary: Colors.white,
-                      shape: const CircleBorder(),
-                      fixedSize: const Size(40, 40),
-                    ),
-                    onPressed: () => _onPressedPlus(_product),
-                    child: const Icon(Icons.add, color: Colors.black)),
-                Spacer(),
-              ]),
             SizedBox(height: 10),
+            Text(
+              _product.name,
+              style: TextStyle(color: Colors.white, fontSize: 25),
+              textAlign: TextAlign.center,
+            ),
+            Expanded(child: Image.asset(_product.image)),
+            Row(children: [
+              Spacer(),
+              ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    primary: Colors.white,
+                    shape: const CircleBorder(),
+                    fixedSize: const Size(40, 40),
+                  ),
+                  onPressed: () => _onPressedAddFavorite(_product),
+                  child: Icon(
+                      _product.inFavorites
+                          ? Icons.favorite
+                          : Icons.favorite_border,
+                      color: Colors.redAccent)),
+              Spacer(),
+              ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    primary: Colors.white,
+                    shape: const CircleBorder(),
+                    fixedSize: const Size(40, 40),
+                  ),
+                  onPressed: () => _onPressedPlus(_product),
+                  child: const Icon(Icons.add, color: Colors.black)),
+              Spacer(),
             ]),
+            SizedBox(height: 10),
+          ]),
           decoration: BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.topRight,
@@ -279,5 +340,19 @@ class _ShopState extends State<Shop> {
                 ),
               ]),
         ));
+  }
+
+  Widget _header(){
+    return DrawerHeader(
+      decoration: BoxDecoration(
+        color: CustomColors.greenColor.shade900,
+      ),
+      child: Center(
+          child: Text(
+            'Shopping list',
+            style: TextStyle(fontSize: 25, color: Colors.white),
+            textAlign: TextAlign.center,
+          )),
+    );
   }
 }

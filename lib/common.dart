@@ -13,6 +13,10 @@ class Common{
 
   static List<Product> shoppingList = [];
 
+  static List<Product> receivedList = [];
+
+  static bool isOrdering = false;
+
   ///Display pop-up at the bottom of the screen
   static showSnackBar(BuildContext _context, String _text) {
     final snackBar = SnackBar(
