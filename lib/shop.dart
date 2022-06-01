@@ -68,7 +68,8 @@ class _ShopState extends State<Shop> {
         Datagram? dg = socket.receive();
         if (dg != null) {
           String received = utf8.decode(dg.data);
-          if (received == "end"){
+          if (received.toLowerCase() == "end"){
+            print(received);
             socket.close();
           }
           for (var _product in Common.allProducts){
@@ -117,11 +118,15 @@ class _ShopState extends State<Shop> {
     });
   }
 
-  _onProductConfirmed(Product _product) {
-    setState(() {
-      Common.receivedList.add(_product);
+  _onProductConfirmed(Product? _product) {
+      if (_product != null){
+        Common.receivedList.add(_product);
+      }
       _shoppingListWidget.clear();
-      _shoppingListWidget.add(_header());
+
+      setState(() {
+        _shoppingListWidget.add(_header());
+      });
       if (Common.receivedList.length == Common.shoppingList.length){
         Common.receivedList.clear();
         Common.shoppingList.clear();
@@ -142,23 +147,27 @@ class _ShopState extends State<Shop> {
           }
         }
         if (_totalCount > 0) {
-          _shoppingListWidget.add(ListTile(
-              title: Center(
-                  child: Text("$_totalCount ${_a.name} ($_receivedCount/$_totalCount done)",
-                      style: TextStyle(fontSize: 20)))));
+          setState(() {
+            _shoppingListWidget.add(ListTile(
+                title: Center(
+                    child: Text("$_totalCount ${_a.name} ($_receivedCount/$_totalCount done)",
+                        style: TextStyle(fontSize: 20)))));
+          });
         }
       }
-      _shoppingListWidget.add(Image.asset(
-        "graphics/loading.gif",
-        height: 125.0,
-        width: 125.0,
-      ));
-    });
+      setState(() {
+        _shoppingListWidget.add(Image.asset(
+          "graphics/loading.gif",
+          height: 125.0,
+          width: 125.0,
+        ));
+      });
   }
 
   _onPressedOrder() {
     setState(() {
       Common.isOrdering = true;
+      _onProductConfirmed(null);
     });
     for (var _a in Common.allProducts) {
       int _count = 0;
