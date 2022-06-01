@@ -33,11 +33,26 @@ class _ShopState extends State<Shop> {
   }
 
   _sendUDP() {
+    String _message = "{";
+    for (var _a in Common.allProducts) {
+      int _count = 0;
+      for (var _b in Common.shoppingList) {
+        if (_a.name == _b.name) {
+          _count++;
+        }
+      }
+      if (_count > 0) {
+        _message += "\"" + _a.name + "\": \"" + _count.toString() + "\",";
+      }
+    }
+    _message = _message.substring(0, _message.length - 1);
+    _message += "}";
+
     RawDatagramSocket.bind(InternetAddress.anyIPv4, 1234)
         .then((RawDatagramSocket socket) {
       socket.broadcastEnabled = true;
       socket.send(
-        '{"tomato": "3","potato": "1","carrot": "2"}'.codeUnits,
+        _message.codeUnits,
         InternetAddress('192.168.43.3'),
         1234,
       );
@@ -58,6 +73,7 @@ class _ShopState extends State<Shop> {
           }
           for (var _product in Common.allProducts){
             if (received == _product.name){
+              print(_product.name);
               _onProductConfirmed(_product);
             }
           }
@@ -77,9 +93,11 @@ class _ShopState extends State<Shop> {
     });
   }
 
-  _onPressedPlus(Product _product) {
+  _onPressedPlus(Product? _product) {
     setState(() {
-      Common.shoppingList.add(_product);
+      if (_product != null){
+        Common.shoppingList.add(_product);
+      }
       _shoppingListWidget.clear();
       _shoppingListWidget.add(_header());
       for (var _a in Common.allProducts) {
@@ -156,8 +174,6 @@ class _ShopState extends State<Shop> {
     FirebaseApi.getCommands();
     _sendUDP();
     _receiveUDP();
-    _onProductConfirmed(Common.allProducts[0]);
-    _onProductConfirmed(Common.allProducts[1]);
     Common.showSnackBar(context, "Order sent");
   }
 
@@ -175,7 +191,7 @@ class _ShopState extends State<Shop> {
   @override
   void initState() {
     CustomColors.currentColor = CustomColors.greenColor.shade900;
-    _shoppingListWidget.add(_header());
+    _onPressedPlus(null);
     super.initState();
   }
 

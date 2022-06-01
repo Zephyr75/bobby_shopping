@@ -43,6 +43,5 @@ ExpansionPanel commandExpansionPanel(Command _command) {
               child: Center(child: Column(children: _lines)),
               color: Colors.white),
       isExpanded: _command.isExpanded,
-      canTapOnHeader: true,
-      hasIcon: false);
+      canTapOnHeader: true);
 }
