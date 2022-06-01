@@ -68,12 +68,12 @@ class _ShopState extends State<Shop> {
         Datagram? dg = socket.receive();
         if (dg != null) {
           String received = utf8.decode(dg.data);
-          if (received.toLowerCase() == "end"){
+          if (received.toLowerCase() == "end") {
             print(received);
             socket.close();
           }
-          for (var _product in Common.allProducts){
-            if (received == _product.name){
+          for (var _product in Common.allProducts) {
+            if (received == _product.name) {
               print(_product.name);
               _onProductConfirmed(_product);
             }
@@ -96,7 +96,7 @@ class _ShopState extends State<Shop> {
 
   _onPressedPlus(Product? _product) {
     setState(() {
-      if (_product != null){
+      if (_product != null) {
         Common.shoppingList.add(_product);
       }
       _shoppingListWidget.clear();
@@ -119,56 +119,55 @@ class _ShopState extends State<Shop> {
   }
 
   _onProductConfirmed(Product? _product) {
-      if (_product != null){
-        Common.receivedList.add(_product);
-      }
-      _shoppingListWidget.clear();
+    Common.receivedList.remove(_product);
 
+    setState(() {
+      _shoppingListWidget.clear();
+      _shoppingListWidget.add(_header());
+    });
+    if (Common.receivedList.isEmpty) {
+      Common.shoppingList.clear();
       setState(() {
+        _shoppingListWidget.clear();
         _shoppingListWidget.add(_header());
       });
-      if (Common.receivedList.length == Common.shoppingList.length){
-        Common.receivedList.clear();
-        Common.shoppingList.clear();
-        Common.isOrdering = false;
-        return;
+      Common.isOrdering = false;
+      return;
+    }
+    for (var _a in Common.allProducts) {
+      int _totalCount = 0;
+      bool _isDone = true;
+      for (var _b in Common.shoppingList) {
+        if (_a.name == _b.name) {
+          _totalCount++;
+        }
       }
-      for (var _a in Common.allProducts) {
-        int _totalCount = 0;
-        int _receivedCount = 0;
-        for (var _b in Common.shoppingList) {
-          if (_a.name == _b.name) {
-            _totalCount++;
-          }
-        }
-        for (var _b in Common.receivedList) {
-          if (_a.name == _b.name) {
-            _receivedCount++;
-          }
-        }
-        if (_totalCount > 0) {
+      for (var _b in Common.receivedList) {
+        if (_a.name == _b.name) {
           setState(() {
-            _shoppingListWidget.add(ListTile(
-                title: Center(
-                    child: Text("$_totalCount ${_a.name} ($_receivedCount/$_totalCount done)",
-                        style: TextStyle(fontSize: 20)))));
+            _isDone = false;
           });
         }
       }
-      setState(() {
-        _shoppingListWidget.add(Image.asset(
-          "graphics/loading.gif",
-          height: 125.0,
-          width: 125.0,
-        ));
-      });
+      if (_totalCount > 0) {
+        _shoppingListWidget.add(ListTile(
+            title: Center(
+                child: Text(
+                    "$_totalCount ${_a.name} " +
+                        (_isDone ? "(done)" : "(loading)"),
+                    style: TextStyle(fontSize: 20)))));
+      }
+    }
+    setState(() {
+      _shoppingListWidget.add(Image.asset(
+        "graphics/loading.gif",
+        height: 125.0,
+        width: 125.0,
+      ));
+    });
   }
 
   _onPressedOrder() {
-    setState(() {
-      Common.isOrdering = true;
-      _onProductConfirmed(null);
-    });
     for (var _a in Common.allProducts) {
       int _count = 0;
       for (var _b in Common.shoppingList) {
@@ -177,9 +176,14 @@ class _ShopState extends State<Shop> {
         }
       }
       if (_count > 0) {
+        Common.receivedList.add(_a);
         FirebaseApi.addOrder(_a, _count);
       }
     }
+    setState(() {
+      Common.isOrdering = true;
+      _onProductConfirmed(null);
+    });
     FirebaseApi.getCommands();
     _sendUDP();
     _receiveUDP();
@@ -229,23 +233,33 @@ class _ShopState extends State<Shop> {
               FloatingActionButton(
                 onPressed: _onPressedSeeFavorites,
                 child: Icon(Icons.favorite,
-                    color: _favoritesDisplayed ? Colors.redAccent : Colors.black),
+                    color:
+                        _favoritesDisplayed ? Colors.redAccent : Colors.black),
               ),
               const Spacer(),
-            Builder(
-                builder: (context) => ElevatedButton.icon(
-                onPressed: Common.isOrdering
-                    ? () => Scaffold.of(context).openEndDrawer()
-                    : _onPressedOrder,
-                label: Text(Common.isOrdering ? "Loading..." : "Order",
-                    style: TextStyle(color: Colors.black, fontSize: 18)),
-                icon:
-                    const Icon(FontAwesome.shopping_cart, color: Colors.black),
-                style: ElevatedButton.styleFrom(
-                    shape: const StadiumBorder(),
-                    fixedSize: const Size(160, 55),
-                    primary: Colors.white),
-              ))
+              Builder(
+                  builder: (context) => ElevatedButton.icon(
+                        onPressed: Common.isOrdering
+                            ? () {
+                                Common.shoppingList.clear();
+                                setState(() {
+                                  _shoppingListWidget.clear();
+                                  _shoppingListWidget.add(_header());
+                                });
+                                Common.isOrdering = false;
+                                return;
+                              }
+                            : _onPressedOrder,
+                        label: Text(Common.isOrdering ? "Cancel" : "Order",
+                            style:
+                                TextStyle(color: Colors.black, fontSize: 18)),
+                        icon: const Icon(FontAwesome.shopping_cart,
+                            color: Colors.black),
+                        style: ElevatedButton.styleFrom(
+                            shape: const StadiumBorder(),
+                            fixedSize: const Size(160, 55),
+                            primary: Colors.white),
+                      ))
             ])),
         floatingActionButtonLocation: FloatingActionButtonLocation.endTop,
         endDrawer: kIsWeb && MediaQuery.of(context).size.width > 700
@@ -302,7 +316,8 @@ class _ShopState extends State<Shop> {
                                   child: Column(children: _shoppingListWidget)))
                           : IconButton(
                               icon: Icon(Icons.arrow_back_ios_sharp),
-                              onPressed: () => Scaffold.of(context).openEndDrawer(),
+                              onPressed: () =>
+                                  Scaffold.of(context).openEndDrawer(),
                             )),
                   Spacer(),
                 ]))));
@@ -344,7 +359,8 @@ class _ShopState extends State<Shop> {
                     shape: const CircleBorder(),
                     fixedSize: const Size(40, 40),
                   ),
-                  onPressed: Common.isOrdering ? null : () => _onPressedPlus(_product),
+                  onPressed:
+                      Common.isOrdering ? null : () => _onPressedPlus(_product),
                   child: const Icon(Icons.add, color: Colors.black)),
               Spacer(),
             ]),
@@ -370,17 +386,17 @@ class _ShopState extends State<Shop> {
         ));
   }
 
-  Widget _header(){
+  Widget _header() {
     return DrawerHeader(
       decoration: BoxDecoration(
         color: CustomColors.greenColor.shade900,
       ),
       child: Center(
           child: Text(
-            'Shopping list',
-            style: TextStyle(fontSize: 25, color: Colors.white),
-            textAlign: TextAlign.center,
-          )),
+        'Shopping list',
+        style: TextStyle(fontSize: 25, color: Colors.white),
+        textAlign: TextAlign.center,
+      )),
     );
   }
 }
