@@ -50,7 +50,7 @@ class _ShopState extends State<Shop> {
       }
     }
     _message = _message.substring(0, _message.length - 1);
-    _message += "}\n";
+    _message += "}";
 
     RawDatagramSocket.bind(InternetAddress.anyIPv4, 1234)
         .then((RawDatagramSocket socket) {
