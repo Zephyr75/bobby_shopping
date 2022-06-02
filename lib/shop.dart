@@ -5,8 +5,11 @@ import 'package:bobby_shopping/firebase_api.dart';
 import 'package:bobby_shopping/product.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:image_downloader/image_downloader.dart';
+import 'package:qr_code_tools/qr_code_tools.dart';
 
 import 'common.dart';
 import 'custom_colors.dart';
@@ -94,7 +97,28 @@ class _ShopState extends State<Shop> {
     });
   }
 
+  _decode() async{
+    try {
+      var imageId = await ImageDownloader.downloadImage(
+          "https://raw.githubusercontent.com/wiki/ko2ic/image_downloader/images/flutter.png"
+      );
+      if (imageId == null) {
+        return;
+      }
+
+      var path = await ImageDownloader.findPath(imageId);
+
+      //String data = await QrCodeToolsPlugin.decodeFrom(path);
+      //print("Data: $data");
+      print(path);
+
+    } on PlatformException catch (error) {
+      print(error);
+    }
+  }
+
   _onPressedPlus(Product? _product) {
+    _decode();
     setState(() {
       if (_product != null) {
         Common.shoppingList.add(_product);
