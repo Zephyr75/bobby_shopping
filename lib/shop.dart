@@ -50,7 +50,7 @@ class _ShopState extends State<Shop> {
       }
     }
     _message = _message.substring(0, _message.length - 1);
-    _message += "}";
+    _message += "}\n";
 
     RawDatagramSocket.bind(InternetAddress.anyIPv4, 1234)
         .then((RawDatagramSocket socket) {
@@ -111,12 +111,12 @@ class _ShopState extends State<Shop> {
     });
   }
 
-  _decode() async{
+  _decode() async {
     print("decode");
     try {
       var imageId = await ImageDownloader.downloadImage(
-        "http://192.168.43.3/capture?_cb=" + DateTime.now().millisecondsSinceEpoch.toString()
-      );
+          "http://192.168.43.3/capture?_cb=" +
+              DateTime.now().millisecondsSinceEpoch.toString());
       if (imageId == null) {
         return;
       }
@@ -125,14 +125,13 @@ class _ShopState extends State<Shop> {
 
       String _data = await QrCodeToolsPlugin.decodeFrom(path);
 
-      if (_data.isNotEmpty){
+      if (_data.isNotEmpty) {
         print("sent");
         _sendUDPProduct(_data + "\n");
       }
 
       print("Data: $_data");
       print(path);
-
     } on PlatformException catch (error) {
       print(error);
     }
@@ -245,7 +244,6 @@ class _ShopState extends State<Shop> {
     });
   }
 
-
   @override
   void initState() {
     CustomColors.currentColor = CustomColors.greenColor.shade900;
@@ -255,7 +253,6 @@ class _ShopState extends State<Shop> {
     });
     super.initState();
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -376,63 +373,71 @@ class _ShopState extends State<Shop> {
   Widget _listItem(BuildContext context, Product _product) {
     return Padding(
         padding: const EdgeInsets.all(0),
-        child: Container(
-          width: 50,
-          height: 50,
-          child: Column(children: [
-            SizedBox(height: 10),
-            Text(
-              _product.name,
-              style: TextStyle(color: Colors.white, fontSize: 25),
-              textAlign: TextAlign.center,
-            ),
-            Expanded(child: Image.asset(_product.image)),
-            Row(children: [
-              Spacer(),
-              ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    primary: Colors.white,
-                    shape: const CircleBorder(),
-                    fixedSize: const Size(40, 40),
-                  ),
-                  onPressed: () => _onPressedAddFavorite(_product),
-                  child: Icon(
-                      _product.inFavorites
-                          ? Icons.favorite
-                          : Icons.favorite_border,
-                      color: Colors.redAccent)),
-              Spacer(),
-              ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    primary: Colors.white,
-                    shape: const CircleBorder(),
-                    fixedSize: const Size(40, 40),
-                  ),
-                  onPressed:
-                      Common.isOrdering ? null : () => _onPressedPlus(_product),
-                  child: const Icon(Icons.add, color: Colors.black)),
-              Spacer(),
-            ]),
-            SizedBox(height: 10),
-          ]),
-          decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topRight,
-                end: Alignment.bottomLeft,
-                colors: [
-                  _product.colorPrimary,
-                  _product.colorSecondary,
-                ],
-              ),
-              borderRadius: BorderRadius.circular(50),
-              boxShadow: [
-                BoxShadow(
-                  blurRadius: 2,
-                  color: Colors.grey.shade300,
-                  offset: const Offset(0, 10),
+        child: GestureDetector(
+            onTap: () {
+              if (Common.isOrdering) {
+                print(_product.name);
+                _sendUDPProduct(_product.name + "\n");
+              }
+            },
+            child: Container(
+              width: 50,
+              height: 50,
+              child: Column(children: [
+                SizedBox(height: 10),
+                Text(
+                  _product.name,
+                  style: TextStyle(color: Colors.white, fontSize: 25),
+                  textAlign: TextAlign.center,
                 ),
+                Expanded(child: Image.asset(_product.image)),
+                Row(children: [
+                  Spacer(),
+                  ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        primary: Colors.white,
+                        shape: const CircleBorder(),
+                        fixedSize: const Size(40, 40),
+                      ),
+                      onPressed: () => _onPressedAddFavorite(_product),
+                      child: Icon(
+                          _product.inFavorites
+                              ? Icons.favorite
+                              : Icons.favorite_border,
+                          color: Colors.redAccent)),
+                  Spacer(),
+                  ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        primary: Colors.white,
+                        shape: const CircleBorder(),
+                        fixedSize: const Size(40, 40),
+                      ),
+                      onPressed: Common.isOrdering
+                          ? null
+                          : () => _onPressedPlus(_product),
+                      child: const Icon(Icons.add, color: Colors.black)),
+                  Spacer(),
+                ]),
+                SizedBox(height: 10),
               ]),
-        ));
+              decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topRight,
+                    end: Alignment.bottomLeft,
+                    colors: [
+                      _product.colorPrimary,
+                      _product.colorSecondary,
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(50),
+                  boxShadow: [
+                    BoxShadow(
+                      blurRadius: 2,
+                      color: Colors.grey.shade300,
+                      offset: const Offset(0, 10),
+                    ),
+                  ]),
+            )));
   }
 
   Widget _header() {
