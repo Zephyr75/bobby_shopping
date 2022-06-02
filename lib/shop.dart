@@ -35,7 +35,7 @@ class _ShopState extends State<Shop> {
     });
   }
 
-  _sendUDP() {
+  _sendUDPList() {
     String _message = "{";
     for (var _a in Common.allProducts) {
       int _count = 0;
@@ -100,7 +100,8 @@ class _ShopState extends State<Shop> {
   _decode() async{
     try {
       var imageId = await ImageDownloader.downloadImage(
-          "https://fr.qr-code-generator.com/wp-content/themes/qr/new_structure/markets/core_market/generator/dist/generator/assets/images/websiteQRCode_noFrame.png"
+        //"https://authena.io/wp-content/uploads/2020/11/qrcodes-lowR.jpg"
+          "http://192.168.43.3/capture?_cb=" + DateTime.now().millisecondsSinceEpoch.toString()
       );
       if (imageId == null) {
         return;
@@ -209,7 +210,7 @@ class _ShopState extends State<Shop> {
       _onProductConfirmed(null);
     });
     FirebaseApi.getCommands();
-    _sendUDP();
+    _sendUDPList();
     _receiveUDP();
     Common.showSnackBar(context, "Order sent");
   }
