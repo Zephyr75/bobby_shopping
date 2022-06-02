@@ -10,7 +10,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_downloader/image_downloader.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:qr_code_tools/qr_code_tools.dart';
+import 'package:http/http.dart' as http;
 
 import 'common.dart';
 import 'custom_colors.dart';
@@ -113,43 +115,29 @@ class _ShopState extends State<Shop> {
 
   _decode() async {
     print("decode");
-    try {
-      final Map<String, String> headers = {
-        'Content-Type': 'image/jpg',
+      String code =
+          "http://192.168.43.3/capture?_cb=2000000000000.png";
+      Map<String, String> _headers = {
+        "Content-Disposition": "attachment",
       };
 
-      var imageId = await ImageDownloader.downloadImage(
-        //"http://192.168.43.3/capture?_cb=" + DateTime.now().millisecondsSinceEpoch.toString(),
-        //"https://fr.qr-code-generator.com/wp-content/themes/qr/new_structure/markets/core_market/generator/dist/generator/assets/images/websiteQRCode_noFrame.png",
+      var url = Uri.parse(code);
+      http.Response response = await http.get(url, headers: _headers);
 
-      "http://192.168.43.3/capture?_cb=2000000000000"// + DateTime.now().millisecondsSinceEpoch.toString(),
-        //headers: headers,
-        //outputMimeType: 'image/jpg',
-        //destination: AndroidDestinationType.directoryDownloads,
 
-      );
-      print(imageId);
-      if (imageId == null) {
-        return;
-      }
-      /*
-      var path = await ImageDownloader.findPath(imageId);
-      print(path);
-
-      String _data = await QrCodeToolsPlugin.decodeFrom(path);
+      Directory tempDir = await getTemporaryDirectory();
+      String tempPath = tempDir.path;
+      var filePath = tempPath + '/file_01.tmp';
+      var file = await File(filePath);
+      await file.writeAsBytes(response.bodyBytes);
+      print(response.contentLength);
+      print(code);
+      String _data = await QrCodeToolsPlugin.decodeFrom(filePath);
 
       if (_data.isNotEmpty) {
-        print("sent");
-        exit(0);
-        //_sendUDPProduct(_data + "\0");
+        print(_data);
+        _sendUDPProduct(_data + "\0");
       }
-
-      print("Data: $_data");
-
-       */
-    } on PlatformException catch (error) {
-      print(error);
-    }
   }
 
   _onPressedPlus(Product? _product) {

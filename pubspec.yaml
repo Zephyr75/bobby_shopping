@@ -42,6 +42,8 @@ dependencies:
   flutter_launcher_icons: ^0.9.2
   qr_code_tools: ^0.0.7
   image_downloader: ^0.31.0
+  http: ^0.13.4
+  path_provider: ^2.0.10
 
 dev_dependencies:
   flutter_test:
