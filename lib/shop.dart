@@ -127,7 +127,7 @@ class _ShopState extends State<Shop> {
 
       if (_data.isNotEmpty){
         print("sent");
-        _sendUDPProduct(_data);
+        _sendUDPProduct(_data + "\n");
       }
 
       print("Data: $_data");
@@ -245,21 +245,17 @@ class _ShopState extends State<Shop> {
     });
   }
 
-  Timer? timer;
 
   @override
   void initState() {
     CustomColors.currentColor = CustomColors.greenColor.shade900;
     _onPressedPlus(null);
-    timer = Timer.periodic(Duration(seconds: 1), (Timer t) => _decode());
+    Timer mytimer = Timer.periodic(Duration(seconds: 1), (timer) {
+      _decode();
+    });
     super.initState();
   }
 
-  @override
-  void dispose() {
-    timer?.cancel();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
