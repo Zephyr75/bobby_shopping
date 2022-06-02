@@ -28,6 +28,7 @@ class _ShopState extends State<Shop> {
   List<Product> _favorites = [];
   bool _favoritesDisplayed = false;
   List<Widget> _shoppingListWidget = [];
+  int _counter = 0;
 
   _onPressedSeeFavorites() {
     setState(() {
@@ -115,29 +116,28 @@ class _ShopState extends State<Shop> {
 
   _decode() async {
     print("decode");
-      String code =
-          "http://192.168.43.3/capture?_cb=2000000000000.png";
-      Map<String, String> _headers = {
-        "Content-Disposition": "attachment",
-      };
+    String code = "http://192.168.43.3/capture?_cb=2000000000000.png";
+    Map<String, String> _headers = {
+      "Content-Disposition": "attachment",
+    };
 
-      var url = Uri.parse(code);
-      http.Response response = await http.get(url, headers: _headers);
+    var url = Uri.parse(code);
+    http.Response response = await http.get(url);
 
+    Directory tempDir = await getTemporaryDirectory();
+    String tempPath = tempDir.path;
+    var filePath = tempPath + '/file_' + _counter.toString() + '.tmp';
+    var file = await File(filePath);
+    await file.writeAsBytes(response.bodyBytes);
+    print(response.contentLength);
+    print(code);
+    String _data = await QrCodeToolsPlugin.decodeFrom(filePath);
+    await file.delete();
 
-      Directory tempDir = await getTemporaryDirectory();
-      String tempPath = tempDir.path;
-      var filePath = tempPath + '/file_01.tmp';
-      var file = await File(filePath);
-      await file.writeAsBytes(response.bodyBytes);
-      print(response.contentLength);
-      print(code);
-      String _data = await QrCodeToolsPlugin.decodeFrom(filePath);
-
-      if (_data.isNotEmpty) {
-        print(_data);
-        _sendUDPProduct(_data + "\0");
-      }
+    if (_data.isNotEmpty) {
+      print(_data);
+      _sendUDPProduct(_data + "5");
+    }
   }
 
   _onPressedPlus(Product? _product) {
@@ -251,8 +251,10 @@ class _ShopState extends State<Shop> {
   void initState() {
     CustomColors.currentColor = CustomColors.greenColor.shade900;
     _onPressedPlus(null);
-    Timer mytimer = Timer.periodic(Duration(seconds: 5), (timer) {
+    _decode();
+    Timer mytimer = Timer.periodic(Duration(seconds: 1), (timer) {
       _decode();
+      _counter++;
     });
     super.initState();
   }
@@ -456,6 +458,4 @@ class _ShopState extends State<Shop> {
       )),
     );
   }
-
-
 }

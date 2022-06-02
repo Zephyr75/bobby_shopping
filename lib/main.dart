@@ -141,9 +141,6 @@ class _MainMenuState extends State<MainMenu> {
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
                 fixedSize: const Size(150, 50))),
                 Spacer(flex: 2),
-          SizedBox(height: 100, width: 200, child: Image.network(
-              "http://192.168.43.3/capture?_cb=" + DateTime.now().millisecondsSinceEpoch.toString()
-          ),)
         ],
       )),
     );
