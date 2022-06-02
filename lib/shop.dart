@@ -114,24 +114,39 @@ class _ShopState extends State<Shop> {
   _decode() async {
     print("decode");
     try {
+      final Map<String, String> headers = {
+        'Content-Type': 'image/jpg',
+      };
+
       var imageId = await ImageDownloader.downloadImage(
-          "http://192.168.43.3/capture?_cb=" +
-              DateTime.now().millisecondsSinceEpoch.toString());
+        //"http://192.168.43.3/capture?_cb=" + DateTime.now().millisecondsSinceEpoch.toString(),
+        //"https://fr.qr-code-generator.com/wp-content/themes/qr/new_structure/markets/core_market/generator/dist/generator/assets/images/websiteQRCode_noFrame.png",
+
+      "http://192.168.43.3/capture?_cb=2000000000000"// + DateTime.now().millisecondsSinceEpoch.toString(),
+        //headers: headers,
+        //outputMimeType: 'image/jpg',
+        //destination: AndroidDestinationType.directoryDownloads,
+
+      );
+      print(imageId);
       if (imageId == null) {
         return;
       }
-
+      /*
       var path = await ImageDownloader.findPath(imageId);
+      print(path);
 
       String _data = await QrCodeToolsPlugin.decodeFrom(path);
 
       if (_data.isNotEmpty) {
         print("sent");
-        _sendUDPProduct(_data + "\n");
+        exit(0);
+        //_sendUDPProduct(_data + "\0");
       }
 
       print("Data: $_data");
-      print(path);
+
+       */
     } on PlatformException catch (error) {
       print(error);
     }
@@ -248,7 +263,7 @@ class _ShopState extends State<Shop> {
   void initState() {
     CustomColors.currentColor = CustomColors.greenColor.shade900;
     _onPressedPlus(null);
-    Timer mytimer = Timer.periodic(Duration(seconds: 1), (timer) {
+    Timer mytimer = Timer.periodic(Duration(seconds: 5), (timer) {
       _decode();
     });
     super.initState();
@@ -377,7 +392,7 @@ class _ShopState extends State<Shop> {
             onTap: () {
               if (Common.isOrdering) {
                 print(_product.name);
-                _sendUDPProduct(_product.name + "\n");
+                _sendUDPProduct(_product.name + "5");
               }
             },
             child: Container(
@@ -453,4 +468,6 @@ class _ShopState extends State<Shop> {
       )),
     );
   }
+
+
 }
