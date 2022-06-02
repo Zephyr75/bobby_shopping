@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
@@ -63,6 +64,19 @@ class _ShopState extends State<Shop> {
     });
   }
 
+  _sendUDPProduct(String _data) {
+    RawDatagramSocket.bind(InternetAddress.anyIPv4, 1234)
+        .then((RawDatagramSocket socket) {
+      socket.broadcastEnabled = true;
+      socket.send(
+        _data.codeUnits,
+        InternetAddress('192.168.43.3'),
+        1234,
+      );
+      socket.close();
+    });
+  }
+
   _receiveUDP() {
     RawDatagramSocket.bind(InternetAddress.anyIPv4, 1234)
         .then((RawDatagramSocket socket) {
@@ -98,10 +112,10 @@ class _ShopState extends State<Shop> {
   }
 
   _decode() async{
+    print("decode");
     try {
       var imageId = await ImageDownloader.downloadImage(
-        //"https://authena.io/wp-content/uploads/2020/11/qrcodes-lowR.jpg"
-          "http://192.168.43.3/capture?_cb=" + DateTime.now().millisecondsSinceEpoch.toString()
+        "http://192.168.43.3/capture?_cb=" + DateTime.now().millisecondsSinceEpoch.toString()
       );
       if (imageId == null) {
         return;
@@ -109,8 +123,14 @@ class _ShopState extends State<Shop> {
 
       var path = await ImageDownloader.findPath(imageId);
 
-      String data = await QrCodeToolsPlugin.decodeFrom(path);
-      print("Data: $data");
+      String _data = await QrCodeToolsPlugin.decodeFrom(path);
+
+      if (_data.isNotEmpty){
+        print("sent");
+        _sendUDPProduct(_data);
+      }
+
+      print("Data: $_data");
       print(path);
 
     } on PlatformException catch (error) {
@@ -119,7 +139,6 @@ class _ShopState extends State<Shop> {
   }
 
   _onPressedPlus(Product? _product) {
-    _decode();
     setState(() {
       if (_product != null) {
         Common.shoppingList.add(_product);
@@ -226,11 +245,20 @@ class _ShopState extends State<Shop> {
     });
   }
 
+  Timer? timer;
+
   @override
   void initState() {
     CustomColors.currentColor = CustomColors.greenColor.shade900;
     _onPressedPlus(null);
+    timer = Timer.periodic(Duration(seconds: 1), (Timer t) => _decode());
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    timer?.cancel();
+    super.dispose();
   }
 
   @override
