@@ -100,7 +100,7 @@ class _ShopState extends State<Shop> {
   _decode() async{
     try {
       var imageId = await ImageDownloader.downloadImage(
-          "https://raw.githubusercontent.com/wiki/ko2ic/image_downloader/images/flutter.png"
+          "https://fr.qr-code-generator.com/wp-content/themes/qr/new_structure/markets/core_market/generator/dist/generator/assets/images/websiteQRCode_noFrame.png"
       );
       if (imageId == null) {
         return;
@@ -108,8 +108,8 @@ class _ShopState extends State<Shop> {
 
       var path = await ImageDownloader.findPath(imageId);
 
-      //String data = await QrCodeToolsPlugin.decodeFrom(path);
-      //print("Data: $data");
+      String data = await QrCodeToolsPlugin.decodeFrom(path);
+      print("Data: $data");
       print(path);
 
     } on PlatformException catch (error) {
